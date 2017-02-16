@@ -64,11 +64,11 @@ class CourseStudent < ActiveRecord::Base
   end
 
   def total_time
-    time_cards.completed.sum &:duration_in_hours
+    time_cards.completed.sum(&:duration_in_hours)
   end
 
   def time_this_week
-    time_cards.completed_this_week.sum &:duration_in_hours
+    time_cards.completed_this_week.sum(&:duration_in_hours)
   end
 
   def check_in_or_out
