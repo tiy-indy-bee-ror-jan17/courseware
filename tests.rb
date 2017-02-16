@@ -22,25 +22,41 @@ ApplicationMigration.migrate(:up)
 class ApplicationTest < Minitest::Test
 
   def setup
+    @user = User.new()
+    @lesson1 = Lesson.create(name: "lesson 1")
+    @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1)
+    @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1)
+
     @school = School.create(name: "school")
-    Term.create(name: "term1", school_id: 1)
-    Term.create(name: "term2", school_id: 1)
+    Term.create(name: "term1", school: @school)
+    Term.create(name: "term2", school: @school)
+
   end
 
   def test_truth
     assert true
   end
 
+
+  def test_lessons_associate_reading
+    assert_equal 2, @lesson1.readings.length
+    assert_equal "lesson 1", @reading1.lesson.name
+  end
+
+  def test_lessons_associate_courses
+  end
+
   def test_school_has_terms
     @school = School.create(name: "school")
-    Term.create(name: "term1", school_id: 1)
-    Term.create(name: "term2", school_id: 1)
-    assert school.terms.length == 2
-    assert "term1" == school.terms.first.name
+    Term.create(name: "term1", school: @school)
+    Term.create(name: "term2", school: @school)
+    assert @school.terms.length == 2
+    assert "term1" == @school.terms.first.name
   end
 
   def test_terms_have_course
     Course.create()
+
   end
 
 
