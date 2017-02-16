@@ -64,9 +64,11 @@ class ApplicationTest < Minitest::Test
     assert "term1" == @school.terms.first.name
   end
 
-  def test_terms_have_course
-    Course.create()
-
+  def test_terms_have_courses
+    @term = Term.create(name: "fall")
+    Course.create(name: "science", term: @term)
+    assert @term.courses.length == 1
+    assert_equal "science", @term.courses.last.name
   end
 
 
