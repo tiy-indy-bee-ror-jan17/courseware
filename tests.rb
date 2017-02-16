@@ -31,6 +31,9 @@ class ApplicationTest < Minitest::Test
     @course1 = Course.create(name: "course 1", term: @term1)
     @course2 = Course.create(name: "course 2", term: @term1)
 
+    @course_instructor1 = CourseInstructor.create(course: @course1)
+    @course_instructor2 = CourseInstructor.create(course: @course1)
+
     @lesson1 = Lesson.create(name: "lesson 1", course: @course1)
     @lesson2 = Lesson.create(name: "lesson 2", course: @course1)
 
@@ -58,6 +61,11 @@ class ApplicationTest < Minitest::Test
   def test_lessons_has_courses
     assert_equal 2, @course1.lessons.length
     assert_equal "course 1", @lesson1.course.name
+  end
+
+  def test_courseinstructor_has_courses
+    assert_equal 2, @course1.course_instructors.length
+    assert_equal "course 1", @course_instructor1.course.name
   end
 
   def test_school_has_terms
