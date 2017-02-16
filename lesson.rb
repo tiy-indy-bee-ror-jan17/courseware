@@ -3,7 +3,7 @@ class Lesson < ActiveRecord::Base
   belongs_to :course
   delegate :code_and_name, to: :course, prefix: true
 
-has_many :pre_class_assignment
+  validates :name, presence: true 
 
   scope :roots, -> { where("parent_lesson_id IS NULL") }
   scope :without_day_assignments, -> { where("day_assignment_id IS NULL") }
