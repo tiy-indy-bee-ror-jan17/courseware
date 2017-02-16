@@ -1,5 +1,6 @@
 class Lesson < ActiveRecord::Base
   has_many :readings
+  belongs_to :course
   delegate :code_and_name, to: :course, prefix: true
 
 has_many :pre_class_assignment

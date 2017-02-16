@@ -23,13 +23,21 @@ class ApplicationTest < Minitest::Test
 
   def setup
     @user = User.new()
-    @lesson1 = Lesson.create(name: "lesson 1")
+    @school = School.create(name: "school")
+
+    Term.create(name: "term1", school: @school)
+    Term.create(name: "term2", school: @school)
+    
+    @course1 = Course.create(name: "course 1")
+    @course2 = Course.create(name: "course 2")
+
+    @lesson1 = Lesson.create(name: "lesson 1", course: @course1)
+    @lesson2 = Lesson.create(name: "lesson 2", course: @course1)
+
     @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1)
     @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1)
 
-    @school = School.create(name: "school")
-    Term.create(name: "term1", school: @school)
-    Term.create(name: "term2", school: @school)
+
 
   end
 
@@ -38,12 +46,14 @@ class ApplicationTest < Minitest::Test
   end
 
 
-  def test_lessons_associate_reading
+  def test_lessons_has_reading
     assert_equal 2, @lesson1.readings.length
     assert_equal "lesson 1", @reading1.lesson.name
   end
 
-  def test_lessons_associate_courses
+  def test_lessons_has_courses
+    assert_equal 2, @course1.lessons.length
+    assert_equal "course 1", @lesson1.course.name
   end
 
   def test_school_has_terms
