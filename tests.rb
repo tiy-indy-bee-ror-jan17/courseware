@@ -28,8 +28,8 @@ class ApplicationTest < Minitest::Test
     @term1 = Term.create(name: "fall", school: @school)
     @term2 = Term.create(name: "spring", school: @school)
 
-    @course1 = Course.create(name: "course 1")
-    @course2 = Course.create(name: "course 2")
+    @course1 = Course.create(name: "course 1", term: @term1)
+    @course2 = Course.create(name: "course 2", term: @term1)
 
     @course_instructor1 = CourseInstructor.create(course: @course1)
     @course_instructor2 = CourseInstructor.create(course: @course1)
@@ -39,6 +39,12 @@ class ApplicationTest < Minitest::Test
 
     @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1)
     @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1)
+
+    @course_student1 = CourseStudent.create(course: @course1)
+    @course_student2 = CourseStudent.create(course: @course1)
+
+    @assignment1 = Assignment.create(name: "assignment1", course: @course1)
+    @assignment2 = Assignment.create(name: "assignment2", course: @course1)
 
   end
 
@@ -63,20 +69,22 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_school_has_terms
-    @school = School.create(name: "school")
-    Term.create(name: "term1", school: @school)
-    Term.create(name: "term2", school: @school)
-    assert @school.terms.length == 2
-    assert "term1" == @school.terms.first.name
+    assert_equal 2, @school.terms.length
+    assert_equal "fall", @school.terms.first.name
   end
 
   def test_terms_have_courses
-    @term = Term.create(name: "fall")
-    Course.create(name: "science", term: @term)
-    assert @term.courses.length == 1
-    assert_equal "science", @term.courses.last.name
+    assert_equal 2, @term1.courses.length
+    assert_equal "course 1", @term1.courses.last.name
   end
 
+  def test_courses_have_course_students
+    assert_equal 2, @course1.course_students.length
+  end
 
+  def test_that_course_has_assignments
+    assert_equal 2, @course1.assignments.length
+    assert_equal "assignment1", @course1.assignments.first.name
+  end
 
 end
