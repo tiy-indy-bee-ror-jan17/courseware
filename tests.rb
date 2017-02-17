@@ -174,9 +174,9 @@ class ApplicationTest < Minitest::Test
     course = Course.create(name: "1st course", course_code: "asdf")
     new_instructor = CourseInstructor.create(course_id: course.id)
     refute course.course_instructors.count == 0
-    course = Course.create
+    course = Course.create(name: "2nd course", course_code: "zzzz")
     new_instructor = CourseInstructor.create
-    course = Course.create
+    course = Course.create(name: "3rd course", course_code: "xxxx")
     course.course_instructors << new_instructor
     refute course.course_instructors.count == 0
 
