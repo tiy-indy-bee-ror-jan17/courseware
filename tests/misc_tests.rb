@@ -41,4 +41,10 @@ class ApplicationTest < Minitest::Test
     refute school.name.length == 0
   end
 
+  def test_a_course_has_many_student_through_course_students
+  end
+
+  def test_a_course_has_one_primary_instructor
+  end
+
 end

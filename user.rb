@@ -1,5 +1,7 @@
 class User < ActiveRecord::Base
 
+  has_many :course_students, foreign_key: 'student_id'
+
   validates :first_name, presence: true
   validates :last_name, presence: true
   validates :email, presence: true, uniqueness: true, format: /\A([\w+\-].?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i

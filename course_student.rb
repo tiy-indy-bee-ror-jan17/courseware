@@ -1,5 +1,7 @@
 class CourseStudent < ActiveRecord::Base
 
+  belongs_to :student, class_name: "CourseStudent", foreign_key: 'student_id'
+
   scope :approved, -> { where(approved: true) }
   scope :unapproved, -> { where(approved: false) }
 

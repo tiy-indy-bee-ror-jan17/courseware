@@ -40,4 +40,15 @@ class UserTest < MiniTest::Test
     refute user3.valid?
   end
 
+  def test_a_course_student_is_associated_with_students
+    student = User.create(first_name: 'Rick', last_name: 'Sanchez', email: 'rick@earthc137.com')
+    cs = CourseStudent.create(student_id: student.id)
+
+    refute cs.student_id.nil?
+  end
+
+  def test_course_student_is_associated_with_assignment_grades
+  end
+
+
 end
