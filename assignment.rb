@@ -3,6 +3,20 @@ class Assignment < ActiveRecord::Base
   belongs_to :lesson, foreign_key: "in_class_assignment_id"
   belongs_to :course
 
+  has_many :lesson_assignments,
+            class_name: "Lesson",
+            foreign_key: "in_class_assignment_id"
+
+  has_many :lessons,
+            class_name: "Lesson",
+            foreign_key: "pre_class_assignment_id"
+
+  validates :course_id, presence: true
+  validates :name, presence: true,
+                   uniqueness: true
+                   {scope: :course, message: "Only one unique assignment name per course"}
+  validates :percent_of_grade, presence: true
+
   scope :active_for_students, -> { where("active_at <= ? AND due_at >= ? AND students_can_submit = ?", Time.now, Time.now, true) }
 
   delegate :code_and_name, :color, to: :course, prefix: true
