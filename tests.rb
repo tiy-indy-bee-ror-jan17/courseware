@@ -41,9 +41,9 @@ class ApplicationTest < Minitest::Test
     assert term.respond_to?(:school)
   end
 
-  def test_course_has_a_school_method
+  def test_course_has_a_term_method
     course = Course.new
-    assert course.respond_to?(:school)
+    assert course.respond_to?(:term)
   end
 
   def test_term_cannot_be_deleted_if_courses
@@ -174,11 +174,11 @@ class ApplicationTest < Minitest::Test
     course = Course.create
     new_instructor = CourseInstructor.create(course_id: course.id)
     refute course.course_instructors.count == 0
-    # course = Course.create
-    # new_instructor = CourseInstructor.create
-    # course = Course.create
-    # course.course_instructors << new_instructor
-    # refute course.course_instructors.count == 0
+    course = Course.create
+    new_instructor = CourseInstructor.create
+    course = Course.create
+    course.course_instructors << new_instructor
+    refute course.course_instructors.count == 0
 
   end
 
