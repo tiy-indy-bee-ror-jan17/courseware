@@ -128,8 +128,8 @@ class ApplicationTest < Minitest::Test
 
   def test_email_unique
     unique_user = User.create(first_name: "luke", last_name: "skywalker", email: "jedi@theforce.com")
-    assert unique_user.valid?, @user.errors.full_messages
-    user = User.create(first_name: "crash", last_name: "dummy", email: @user.email)
+    assert unique_user.valid?, unique_user.errors.full_messages
+    user = User.create(first_name: "crash", last_name: "dummy", email: unique_user.email)
     refute user.save
     assert user.errors.full_messages.include?("Email has already been taken")
   end
@@ -149,7 +149,19 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_that_readings_must_have_ordernumber_lessonid_and_url
-    #binding.pry
+
+  end
+
+  def test_validate_photo_url_starts_with_http
+
+  end
+
+  def test_validate_assignments_have_courseid_name_percentofgrade
+
+  end
+
+  def test_validate_assignment_name_unique_within_courseid
+
   end
 
 end
