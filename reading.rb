@@ -10,7 +10,7 @@ class Reading < ActiveRecord::Base
   validates :order_number, presence: true
   validates :lesson_id, presence: true
   validates :url, presence: true
-
+  validates :url, format: {with: /\Ahttps?:\/\/\S+/i}
   def clone
     dup
   end
