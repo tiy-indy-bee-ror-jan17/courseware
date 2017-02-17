@@ -31,8 +31,8 @@ class ApplicationTest < Minitest::Test
     @term1 = Term.create(name: "fall", school: @school, starts_on: 5, ends_on: 12)
     @term2 = Term.create(name: "spring", school: @school, starts_on: 2, ends_on: 10)
 
-    @course1 = Course.create(name: "course 1", term: @term1)
-    @course2 = Course.create(name: "course 2", term: @term1)
+    @course1 = Course.create(name: "course 1", term: @term1, course_code: "Phil")
+    @course2 = Course.create(name: "course 2", term: @term1, course_code: "Dave")
 
     @course_instructor1 = CourseInstructor.create(course: @course1)
     @course_instructor2 = CourseInstructor.create(course: @course1)
@@ -50,66 +50,79 @@ class ApplicationTest < Minitest::Test
     @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1, order_number: 2, url: "http://google.com")
   end
 
-  def teardown
-
-  end
-
-  def test_truth
+  def test_truth_and_like______everything_else_too
     assert true
+    lessons_has_reading
+    lessons_has_courses
+    courseinstructor_has_courses
+    school_has_terms
+    terms_have_courses
+    courses_have_course_students
+    that_course_has_assignments
+    lesson_has_in_class_assignments
+    course_has_many_readings_through_lessons
+    validate_school_has_name
+    validate_terms_have_name_startson_endon_and_schoolid
+    validate_user_has_firstname_lastname_email
+    email_unique
+    that_lessons_have_names
+    that_readings_must_have_ordernumber_lessonid_and_url
+    readings_urls_start_with_hypertext_transfer_protocol
+    courses_have_coursecodes_and_names
+    course_code_unique
   end
 
-
-  def test_lessons_has_reading
+  def lessons_has_reading
     assert_equal 2, @lesson1.readings.length
     assert_equal "lesson 1", @reading1.lesson.name
   end
 
-  def test_lessons_has_courses
+  def lessons_has_courses
     assert_equal 2, @course1.lessons.length
     assert_equal "course 1", @lesson1.course.name
   end
 
-  def test_courseinstructor_has_courses
+  def courseinstructor_has_courses
     assert_equal 2, @course1.course_instructors.length
     assert_equal "course 1", @course_instructor1.course.name
   end
 
-  def test_school_has_terms
+  def school_has_terms
     assert_equal 2, @school.terms.length
     assert_equal "fall", @school.terms.first.name
   end
 
-  def test_terms_have_courses
+  def terms_have_courses
     assert_equal 2, @term1.courses.length
     assert_equal "course 1", @term1.courses.last.name
   end
 
-  def test_courses_have_course_students
+  def courses_have_course_students
     assert_equal 2, @course1.course_students.length
   end
 
-  def test_that_course_has_assignments
+  def that_course_has_assignments
     assert_equal 2, @course1.assignments.length
     assert_equal "assignment 1", @course1.assignments.first.name
   end
 
-  def test_lesson_has_in_class_assignments
+  def lesson_has_in_class_assignments
     assert_equal "lesson 1", @assignment1.lessons_in.first.name
     assert_equal "assignment 1", @lesson1.in_class_assignment.name
   end
 
-  def test_course_has_many_readings_through_lessons
+  def course_has_many_readings_through_lessons
     assert_equal 2, @course1.readings.length
     assert_equal 1, @reading1.courses.length
   end
 
-  def test_validate_school_has_name
+  def validate_school_has_name
     school = School.new
     refute school.save
     assert school.errors.full_messages.include?("Name can't be blank")
   end
 
-  def test_validate_terms_have_name_startson_endon_and_schoolid
+  def validate_terms_have_name_startson_endon_and_schoolid
     term = Term.new
     refute term.save
     assert term.errors.full_messages.include?("Name can't be blank")
@@ -118,7 +131,7 @@ class ApplicationTest < Minitest::Test
     assert term.errors.full_messages.include?("School can't be blank")
   end
 
-  def test_validate_user_has_firstname_lastname_email
+  def validate_user_has_firstname_lastname_email
     user = User.new
     refute user.save
     assert user.errors.full_messages.include?("First name can't be blank")
@@ -126,25 +139,25 @@ class ApplicationTest < Minitest::Test
     assert user.errors.full_messages.include?("Email can't be blank")
   end
 
-  def test_email_unique
-    unique_user = User.create(first_name: "luke", last_name: "skywalker", email: "jedi@theforce.com")
+  def email_unique
+    unique_user = User.create(first_name: "anakin", last_name: "skywalker", email: "darklord@theforce.com")
     assert unique_user.valid?, unique_user.errors.full_messages
     user = User.create(first_name: "crash", last_name: "dummy", email: unique_user.email)
     refute user.save
     assert user.errors.full_messages.include?("Email has already been taken")
   end
 
-  def test_email_appropriate_form
+  def email_appropriate_form
 
   end
 
-  def test_that_lessons_have_names
+  def that_lessons_have_names
     l = Lesson.new
     refute l.save
     assert l.errors.full_messages.include?("Name can't be blank")
   end
 
-  def test_that_readings_must_have_ordernumber_lessonid_and_url
+  def that_readings_must_have_ordernumber_lessonid_and_url
     r = Reading.new
     refute r.save
     assert r.errors.full_messages.include?("Order number can't be blank")
@@ -153,28 +166,41 @@ class ApplicationTest < Minitest::Test
   end
 
 
-  def test_readings_urls_start_with_hypertext_transfer_protocol
-    u = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://")
-    r = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "https://")
-  #  l = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "anything else")
+  def readings_urls_start_with_hypertext_transfer_protocol
+    u = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "https://google.com")
+    r = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
+    l = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "anything else")
+    s = Reading.new
     assert u.save
     assert r.save
-    #refute l.save
+    refute l.save
+    refute s.save
   end
 
-  def test_that_readings_must_have_ordernumber_lessonid_and_url
+  def courses_have_coursecodes_and_names
+    c = Course.new
+    r = @course1
+    refute c.save
+    assert r.save
+  end
+
+  def course_code_unique
+    psy101 = Course.new(name: "course 1", term: @term1, course_code: "psy101")
+    not_og = Course.new(name: "this won't work", term: @term1, course_code: psy101.course_code)
+    assert psy101.save
+    refute not_og.save
+  end
+
+
+  def validate_photo_url_starts_with_http
 
   end
 
-  def test_validate_photo_url_starts_with_http
+  def validate_assignments_have_courseid_name_percentofgrade
 
   end
 
-  def test_validate_assignments_have_courseid_name_percentofgrade
-
-  end
-
-  def test_validate_assignment_name_unique_within_courseid
+  def validate_assignment_name_unique_within_courseid
 
   end
 
