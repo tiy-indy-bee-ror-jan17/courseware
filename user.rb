@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
 
-  has_many :course_students, foreign_key: "student_id"
+  has_many :course_students, class_name: "CourseStudent", foreign_key: "student_id"
 
   scope :want_to_be_instructors, -> { where(wants_to_be_instructor: true) }
   scope :instructors_for_school_id, ->(school_id) { where(school_id: school_id, instructor: true) }
