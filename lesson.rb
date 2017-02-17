@@ -2,7 +2,7 @@ class Lesson < ActiveRecord::Base
   delegate :code_and_name, to: :course, prefix: true
 
   has_many :readings, dependent: :destroy
-  belongs_to :in_class_assigments, foreign_key: "in_class_assignment_id", class_name: Assignment
+  belongs_to :in_class_assigments, foreign_key: "in_class_assignment_id", class_name: "Assignment"
   belongs_to :course
 
   scope :roots, -> { where("parent_lesson_id IS NULL") }

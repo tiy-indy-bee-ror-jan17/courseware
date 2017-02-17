@@ -40,9 +40,9 @@ class ApplicationTest < Minitest::Test
   def test_destroying_a_course_destroys_its_associated_lessons
     course_test = Course.create(name: "Destroying lessons like a BAWSS")
 
-    lesson_test = Lesson.create(course_id: course_test.id, parent_lesson_id: 99, name: "Destroy this lesson!", pre_class_assignment_id: 1, in_class_assignment_id: 1)
+    lesson_test = Lesson.create(course_id: course_test.id, parent_lesson_id: 99, name: "Destroy this lesson!")
 
-    lesson_test2 = Lesson.create(course_id: course_test.id, parent_lesson_id: 99, name: "Destroy this lesson too!", pre_class_assignment_id: 1, in_class_assignment_id: 1)
+    lesson_test2 = Lesson.create(course_id: course_test.id, parent_lesson_id: 99, name: "Destroy this lesson too!")
 
     course_test.destroy
     refute Lesson.find_by(name: "Destroy this lesson!")
@@ -59,8 +59,10 @@ class ApplicationTest < Minitest::Test
 
   #B-Test-4
   def test_that_a_lesson_is_associated_with_its_in_class_assignment
-    lesson_test = Lesson.create()
-    assign_test = 
+    assign_test = Assignment.create(name: "Assignment Test")
+    lesson_test = Lesson.create(in_class_assignment_id: assign_test.id)
+
+    assert lesson_test.in_class_assignment_id == assign_test.id
   end
 
 
