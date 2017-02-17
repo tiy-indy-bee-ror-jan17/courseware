@@ -48,6 +48,10 @@ class UserTest < MiniTest::Test
   end
 
   def test_course_student_is_associated_with_assignment_grades
+    cs = CourseStudent.create
+    grade = AssignmentGrade.create(course_student_id: cs.id)
+
+    refute grade.course_student.nil?
   end
 
 
