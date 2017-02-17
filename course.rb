@@ -9,6 +9,9 @@ class Course < ActiveRecord::Base
 # and ends with three numbers. Use a regular expression.
 # validates
 
+  has_many :course_instructors, dependent: :restrict_with_error
+  has_many :lessons, dependent: :destroy
+
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
 
   # Magic number also used in old? method below.
