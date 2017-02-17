@@ -17,16 +17,16 @@ ActiveRecord::Base.establish_connection(
 begin ApplicationMigration.migrate(:down); rescue; end
 ApplicationMigration.migrate(:up)
 
-
+require 'pry'
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
   def setup
-    @user = User.new()
+    @user = User.create(first_name: "never", last_name: "nude", email: "dude@never.nude" )
     @school = School.create(name: "school")
 
-    @term1 = Term.create(name: "fall", school: @school)
-    @term2 = Term.create(name: "spring", school: @school)
+    @term1 = Term.create(name: "fall", school: @school, starts_on: 5, ends_on: 12)
+    @term2 = Term.create(name: "spring", school: @school, starts_on: 2, ends_on: 10)
 
     @course1 = Course.create(name: "course 1", term: @term1)
     @course2 = Course.create(name: "course 2", term: @term1)
@@ -91,6 +91,43 @@ class ApplicationTest < Minitest::Test
     assert_equal "assignment 1", @lesson1.in_class_assignment.name
   end
 
+  def test_course_has_many_readings_through_lessons
+    assert_equal 2, @course1.readings.length
+    assert_equal 1, @reading1.courses.length
+  end
+
+  def test_validate_school_has_name
+    school = School.new
+    refute school.save
+    assert school.errors.full_messages.include?("Name can't be blank")
+  end
+
+  def test_validate_terms_have_name_startson_endon_and_schoolid
+    term = Term.new
+    refute term.save
+    assert term.errors.full_messages.include?("Name can't be blank")
+    assert term.errors.full_messages.include?("Starts on can't be blank")
+    assert term.errors.full_messages.include?("Ends on can't be blank")
+    assert term.errors.full_messages.include?("School can't be blank")
+  end
+
+  def test_validate_user_has_firstname_lastname_email
+    user = User.new
+    refute user.save
+    assert user.errors.full_messages.include?("First name can't be blank")
+    assert user.errors.full_messages.include?("Last name can't be blank")
+    assert user.errors.full_messages.include?("Email can't be blank")
+  end
+
+  def test_email_unique
+    p @user.errors.full_messages
+    # user = User.create(first_name: "crash", last_name: "dummy", email: @user.email)
+    # refute user.save
+    # assert user.errors.full_messages.include?("Email has already been taken")
+    #
+    # p user
+  end
+
   def test_that_lessons_have_names
     l = Lesson.new(name: "    ")
     refute l.valid?
@@ -102,7 +139,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_that_readings_must_have_ordernumber_lessonid_and_url
-    
+    #binding.pry
   end
 
 end
