@@ -46,8 +46,8 @@ class ApplicationTest < Minitest::Test
     @lesson1 = Lesson.create(name: "lesson 1", course: @course1, in_class_assignment: @assignment1)
     @lesson2 = Lesson.create(name: "lesson 2", course: @course1)
 
-    @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1)
-    @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1)
+    @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
+    @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1, order_number: 2, url: "http://google.com")
   end
 
   def teardown
@@ -135,17 +135,31 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_email_appropriate_form
-    
+
   end
 
   def test_that_lessons_have_names
-    l = Lesson.new(name: "    ")
-    refute l.valid?
+    l = Lesson.new
+    refute l.save
+    assert l.errors.full_messages.include?("Name can't be blank")
   end
 
-  def test_that_name_cannot_be_nil
-    l = Lesson.new(name: nil)
-    refute l.valid?
+  def test_that_readings_must_have_ordernumber_lessonid_and_url
+    r = Reading.new
+    refute r.save
+    assert r.errors.full_messages.include?("Order number can't be blank")
+    assert r.errors.full_messages.include?("Lesson can't be blank")
+    assert r.errors.full_messages.include?("Url can't be blank")
+  end
+
+
+  def test_readings_urls_start_with_hypertext_transfer_protocol
+    u = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://")
+    r = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "https://")
+  #  l = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "anything else")
+    assert u.save
+    assert r.save
+    #refute l.save
   end
 
   def test_that_readings_must_have_ordernumber_lessonid_and_url
