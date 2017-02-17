@@ -135,7 +135,14 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_email_appropriate_form
-
+    user1 = User.create(first_name: "ben", last_name: "1", email: "bademail")
+    user2 = User.create(first_name: "kendrick", last_name: "2", email: "another bad email @stupidmail.com")
+    user3 = User.create(first_name: "never", last_name: "nude", email: "awesome@email.com")
+    assert user1.errors.full_messages.include?("Email is bad juju")
+    assert user2.errors.full_messages.include?("Email is bad juju")
+    assert user3.valid?
+    refute user1.valid?
+    refute user2.valid?
   end
 
   def test_that_lessons_have_names
@@ -167,6 +174,12 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_validate_photo_url_starts_with_http
+    user1 = User.create(first_name: "dave", last_name: "nevernude", email: "dave@nevernude.com", photo_url: "https:nevernudephotos")
+    user2 = User.create(first_name: "phil", last_name: "nevernude", email: "phil@nevernude.com", photo_url: "http://nevernudephotos")
+    user3 = User.create(first_name: "george", last_name: "michael", email: "georgemichael@arresteddev.com", photo_url: "https://maybe")
+    assert user1.errors.full_messages.include?("Photo url is bad potato")
+    assert user2.valid?, user1.errors.full_messages
+    assert user3.valid?, user1.errors.full_messages 
 
   end
 
