@@ -2,11 +2,15 @@ class Course < ActiveRecord::Base
 
   has_many :lessons
   has_many :course_instructors
+
+  belongs_to :term
+  has_many :course_students
+  has_many :assignments
+  has_many :readings, through: :lessons
+
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
 
-belongs_to :term
-has_many :course_students
-has_many :assignments
+
 
   # Magic number also used in old? method below.
   scope :active, -> { includes(:term).where("terms.ends_on >= ?", Time.now - 1.month) }

@@ -3,12 +3,9 @@ class Assignment < ActiveRecord::Base
   scope :active_for_students, -> { where("active_at <= ? AND due_at >= ? AND students_can_submit = ?", Time.now, Time.now, true) }
 
   belongs_to :course
-  has_many :lessons, foreign_key: "in_class_assignment_id"
-  #has_many :lessons, foreign_key: "pre_class_assignment_id"
+  has_many :lessons_in, class_name: "Lesson", foreign_key: "in_class_assignment_id"
+  has_many :lessons_pre, class_name: "Lesson", foreign_key: "pre_class_assignment_id"
 
-  def getforeign_key
-
-  end
 
   delegate :code_and_name, :color, to: :course, prefix: true
 

@@ -18,15 +18,18 @@ begin ApplicationMigration.migrate(:down); rescue; end
 ApplicationMigration.migrate(:up)
 
 
+
+require 'pry'
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
+
   def setup
-    @user = User.new()
+    @user = User.create(first_name: "never", last_name: "nude", email: "email@email.com" )
     @school = School.create(name: "school")
 
-    @term1 = Term.create(name: "fall", school: @school)
-    @term2 = Term.create(name: "spring", school: @school)
+    @term1 = Term.create(name: "fall", school: @school, starts_on: 5, ends_on: 12)
+    @term2 = Term.create(name: "spring", school: @school, starts_on: 2, ends_on: 10)
 
     @course1 = Course.create(name: "course 1", term: @term1)
     @course2 = Course.create(name: "course 2", term: @term1)
@@ -45,6 +48,10 @@ class ApplicationTest < Minitest::Test
 
     @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1)
     @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1)
+  end
+
+  def teardown
+
   end
 
   def test_truth
@@ -87,8 +94,48 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_lesson_has_in_class_assignments
-    assert_equal "lesson 1", @assignment1.lessons.first.name
+    assert_equal "lesson 1", @assignment1.lessons_in.first.name
     assert_equal "assignment 1", @lesson1.in_class_assignment.name
+  end
+
+  def test_course_has_many_readings_through_lessons
+    assert_equal 2, @course1.readings.length
+    assert_equal 1, @reading1.courses.length
+  end
+
+  def test_validate_school_has_name
+    school = School.new
+    refute school.save
+    assert school.errors.full_messages.include?("Name can't be blank")
+  end
+
+  def test_validate_terms_have_name_startson_endon_and_schoolid
+    term = Term.new
+    refute term.save
+    assert term.errors.full_messages.include?("Name can't be blank")
+    assert term.errors.full_messages.include?("Starts on can't be blank")
+    assert term.errors.full_messages.include?("Ends on can't be blank")
+    assert term.errors.full_messages.include?("School can't be blank")
+  end
+
+  def test_validate_user_has_firstname_lastname_email
+    user = User.new
+    refute user.save
+    assert user.errors.full_messages.include?("First name can't be blank")
+    assert user.errors.full_messages.include?("Last name can't be blank")
+    assert user.errors.full_messages.include?("Email can't be blank")
+  end
+
+  def test_email_unique
+    unique_user = User.create(first_name: "luke", last_name: "skywalker", email: "jedi@theforce.com")
+    assert unique_user.valid?, unique_user.errors.full_messages
+    user = User.create(first_name: "crash", last_name: "dummy", email: unique_user.email)
+    refute user.save
+    assert user.errors.full_messages.include?("Email has already been taken")
+  end
+
+  def test_email_appropriate_form
+    
   end
 
   def test_that_lessons_have_names
@@ -102,7 +149,19 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_that_readings_must_have_ordernumber_lessonid_and_url
-    
+
+  end
+
+  def test_validate_photo_url_starts_with_http
+
+  end
+
+  def test_validate_assignments_have_courseid_name_percentofgrade
+
+  end
+
+  def test_validate_assignment_name_unique_within_courseid
+
   end
 
 end
