@@ -1,5 +1,13 @@
 class Reading < ActiveRecord::Base
 
+  belongs_to :lesson
+
+
+# Validate that Readings must have an order_number, a lesson_id, and a url.
+  validates   :order_number, presence: true
+  validates   :lesson_id, presence: true
+  validates   :url, presence: true
+
   default_scope { order('order_number') }
 
   scope :pre, -> { where("before_lesson = ?", true) }
