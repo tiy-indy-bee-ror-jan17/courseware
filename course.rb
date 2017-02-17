@@ -3,6 +3,8 @@ class Course < ActiveRecord::Base
   belongs_to :term
   has_many :course_students, dependent: :restrict_with_error
   has_many :assignments, dependent: :destroy
+  has_many :course_instructors
+  has_many :instructors, through: :course_instructors
   validates :course_code, :name, presence: true
   validates :course_code, uniqueness: { scope: :term }, format: { with: /\A[a-zA-Z]{3}.*[\d]{3}\z/ }
 
