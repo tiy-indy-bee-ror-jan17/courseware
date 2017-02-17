@@ -137,4 +137,19 @@ class ApplicationTest < Minitest::Test
     refute reading.errors.any?
   end
 
+  def test_school_course_through_terms
+    school = School.create
+    refute school.errors.any?
+    term1  = Term.create
+    refute term1.errors.any?
+    course = Course.create(
+      course_code: 101,
+      name: "Ruby"
+      )
+    refute course.errors.any?
+    school.terms << term1
+    term1.courses << course
+    assert school.courses.count >= 1
+  end
+
 end
