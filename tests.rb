@@ -26,7 +26,7 @@ class ApplicationTest < Minitest::Test
     assert true
   end
 
-  def test_lessons_has_readings
+  def test_when_lessons_is_destroyed_so_is_readings
     lesson = Lesson.create
     new_reading = Reading.create
     lesson.readings << new_reading
@@ -34,7 +34,7 @@ class ApplicationTest < Minitest::Test
     refute Reading.find_by(id: new_reading.id)
   end
 
-  def test_course_has_lessons
+  def test_when_course_is_destroyed_so_is_lessons
     course = Course.create
     new_lesson = Lesson.create
     course.lessons << new_lesson
@@ -54,17 +54,21 @@ class ApplicationTest < Minitest::Test
 
   end
 
-  def test_course_instructors_is_deleted_when_course_is_deleted
+  def test_course_instructors_is_not_deleted_when_course_is_deleted
     course = Course.create
     new_instructor = CourseInstructor.create
     course.course_instructors << new_instructor
     course.destroy
     assert course.course_instructors.exists? == true
-
-
   end
 
   def test_lessons_to_in_class_assignments
+    new_assignment = Assignment.create
+    lesson = Lesson.create(in_class_assignment_id: new_assignment.id)
+    assert lesson.respond_to?(:in_class_assignment)
+  end
+
+  def test_in_class_assignments_to_lessons
 
   end
 
