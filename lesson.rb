@@ -4,11 +4,11 @@ class Lesson < ActiveRecord::Base
   belongs_to :course
   belongs_to :in_class_assignments,
               class_name: "Assignment",
-              foreign_key: "id"
+              foreign_key: "in_class_assignment_id"
 
   belongs_to :pre_class_assignments,
               class_name: "Assignment",
-              foreign_key: "id"
+              foreign_key: "pre_class_assignment_id"
 
   delegate :code_and_name, to: :course, prefix: true
 

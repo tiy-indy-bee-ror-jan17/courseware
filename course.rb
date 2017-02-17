@@ -1,8 +1,17 @@
 class Course < ActiveRecord::Base
 
   has_many :lessons
-  has_many :instructors, dependent: :restrict_with_error
+  has_many :course_instructors
   has_many :readings, through: :lessons
+  has_many :course_students, class_name: "CourseStudent",
+                             foreign_key: "course_id"
+  has_many :students, class_name: "User",
+                      foreign_key: "student_id",
+                      through: :course_students
+  has_many :instructors, through: :course_instructors,
+                         dependent: :restrict_with_error
+
+  # has_one :primary_instructor, through: :course_instructor
 
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
 
