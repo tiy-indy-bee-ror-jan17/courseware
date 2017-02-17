@@ -1,6 +1,7 @@
 class User < ActiveRecord::Base
   # assocations
   has_many :course_students, foreign_key: "student_id"
+  has_many :courses, through: :course_students
   # validation
   validates :first_name, presence: true
   validates :last_name, presence: true
