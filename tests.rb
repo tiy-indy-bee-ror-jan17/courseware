@@ -91,4 +91,18 @@ class ApplicationTest < Minitest::Test
     assert_equal "assignment 1", @lesson1.in_class_assignment.name
   end
 
+  def test_that_lessons_have_names
+    l = Lesson.new(name: "    ")
+    refute l.valid?
+  end
+
+  def test_that_name_cannot_be_nil
+    l = Lesson.new(name: nil)
+    refute l.valid?
+  end
+
+  def test_that_readings_must_have_ordernumber_lessonid_and_url
+    
+  end
+
 end
