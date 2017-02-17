@@ -1,6 +1,6 @@
 class CourseStudent < ActiveRecord::Base
 
-  belongs_to :student, class_name: "User", foreign_key: "id"
+  belongs_to :student, foreign_key: "id"
   has_many :assignment_grades, foreign_key: "id"
 
 
