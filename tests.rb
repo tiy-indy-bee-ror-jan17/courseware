@@ -40,7 +40,6 @@ class ApplicationTest < Minitest::Test
     assert true
   end
 
-# <<<<<<< HEAD
   def test_school_has_many_terms
     assert_equal 2, @school.terms.length
   end
@@ -157,7 +156,6 @@ class ApplicationTest < Minitest::Test
     course.errors.full_messages.include?("Course code is invalid")
   end
 
-# =======
   # B-Test-1
   def test_a_reading_is_destroyed_when_its_lesson_is_destroyed
     lesson_test = Lesson.create(course_id: 99, parent_lesson_id: 99, name: "Test Reading destroyed", pre_class_assignment_id: 1, in_class_assignment_id: 1)
@@ -280,7 +278,4 @@ class ApplicationTest < Minitest::Test
     refute unique_email1.save
   end
 
-
-#End of Class
-# >>>>>>> e3d3ce7f5d00b81f1ff70ff75e73e6c66a2ae7be
 end
