@@ -34,18 +34,17 @@ class ApplicationTest < Minitest::Test
     @course_instructor1 = CourseInstructor.create(course: @course1)
     @course_instructor2 = CourseInstructor.create(course: @course1)
 
-    @lesson1 = Lesson.create(name: "lesson 1", course: @course1)
+    @course_student1 = CourseStudent.create(course: @course1)
+    @course_student2 = CourseStudent.create(course: @course1)
+
+    @assignment1 = Assignment.create(name: "assignment 1", course: @course1)
+    @assignment2 = Assignment.create(name: "assignment 2", course: @course1)
+
+    @lesson1 = Lesson.create(name: "lesson 1", course: @course1, in_class_assignment: @assignment1)
     @lesson2 = Lesson.create(name: "lesson 2", course: @course1)
 
     @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1)
     @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1)
-
-    @course_student1 = CourseStudent.create(course: @course1)
-    @course_student2 = CourseStudent.create(course: @course1)
-
-    @assignment1 = Assignment.create(name: "assignment1", course: @course1)
-    @assignment2 = Assignment.create(name: "assignment2", course: @course1)
-
   end
 
   def test_truth
@@ -84,7 +83,12 @@ class ApplicationTest < Minitest::Test
 
   def test_that_course_has_assignments
     assert_equal 2, @course1.assignments.length
-    assert_equal "assignment1", @course1.assignments.first.name
+    assert_equal "assignment 1", @course1.assignments.first.name
+  end
+
+  def test_lesson_has_in_class_assignments
+    assert_equal "lesson 1", @assignment1.lessons.first.name
+    assert_equal "assignment 1", @lesson1.in_class_assignment.name
   end
 
 end
