@@ -171,7 +171,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_courses_has_course_instructors
-    course = Course.create
+    course = Course.create(name: "1st course", course_code: "asdf")
     new_instructor = CourseInstructor.create(course_id: course.id)
     refute course.course_instructors.count == 0
     course = Course.create
@@ -183,7 +183,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_course_instructors_is_not_deleted_when_course_is_deleted
-    course = Course.create
+    course = Course.create(name: "1st course", course_code: "asdf")
     new_instructor = CourseInstructor.create
     course.course_instructors << new_instructor
     course.destroy
@@ -197,6 +197,9 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_in_class_assignments_to_lessons
+    new_assignment = Assignment.create
+    new_lesson = Lesson.create(name: "asdfa", in_class_assignment_id: new_assignment.id)
+    assert new_lesson.in_class_assignment == new_assignment
 
   end
 
