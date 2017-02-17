@@ -40,8 +40,8 @@ class ApplicationTest < Minitest::Test
     @course_student1 = CourseStudent.create(course: @course1)
     @course_student2 = CourseStudent.create(course: @course1)
 
-    @assignment1 = Assignment.create(name: "assignment 1", course: @course1)
-    @assignment2 = Assignment.create(name: "assignment 2", course: @course1)
+    @assignment1 = Assignment.create(name: "assignment 1", course: @course1, percent_of_grade: 0.72)
+    @assignment2 = Assignment.create(name: "assignment 2", course: @course1, percent_of_grade: 0.86)
 
     @lesson1 = Lesson.create(name: "lesson 1", course: @course1, in_class_assignment: @assignment1)
     @lesson2 = Lesson.create(name: "lesson 2", course: @course1)
@@ -179,12 +179,17 @@ class ApplicationTest < Minitest::Test
     user3 = User.create(first_name: "george", last_name: "michael", email: "georgemichael@arresteddev.com", photo_url: "https://maybe")
     assert user1.errors.full_messages.include?("Photo url is bad potato")
     assert user2.valid?, user1.errors.full_messages
-    assert user3.valid?, user1.errors.full_messages 
+    assert user3.valid?, user1.errors.full_messages
 
   end
 
   def test_validate_assignments_have_courseid_name_percentofgrade
-
+    assignment = Assignment.new
+    refute assignment.save
+    p assignment.errors.full_messages
+    assert assignment.errors.full_messages.include?("Name can't be blank")
+    assert assignment.errors.full_messages.include?("Course can't be blank")
+    assert assignment.errors.full_messages.include?("Percent of grade can't be blank")
   end
 
   def test_validate_assignment_name_unique_within_courseid
