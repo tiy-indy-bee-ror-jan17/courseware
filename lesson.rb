@@ -1,4 +1,10 @@
 class Lesson < ActiveRecord::Base
+
+  belongs_to :course
+  belongs_to :in_class_assignment, class_name: "Assignment", foreign_key: 'in_class_assignment_id'
+
+  has_many :readings, dependent: :destroy
+
   delegate :code_and_name, to: :course, prefix: true
 
   scope :roots, -> { where("parent_lesson_id IS NULL") }
