@@ -1,7 +1,7 @@
 class Reading < ActiveRecord::Base
 
   belongs_to :lesson, dependent: :destroy
-  has_and_belongs_to_many :courses
+  has_many :courses, through: :lessons
 
   default_scope { order('order_number') }
 
