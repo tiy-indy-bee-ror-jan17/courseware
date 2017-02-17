@@ -17,12 +17,15 @@ ActiveRecord::Base.establish_connection(
 begin ApplicationMigration.migrate(:down); rescue; end
 ApplicationMigration.migrate(:up)
 
+
+
 require 'pry'
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
+
   def setup
-    @user = User.create(first_name: "never", last_name: "nude", email: "dude@never.nude" )
+    @user = User.create(first_name: "never", last_name: "nude", email: "email@email.com" )
     @school = School.create(name: "school")
 
     @term1 = Term.create(name: "fall", school: @school, starts_on: 5, ends_on: 12)
@@ -45,6 +48,10 @@ class ApplicationTest < Minitest::Test
 
     @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1)
     @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1)
+  end
+
+  def teardown
+
   end
 
   def test_truth
@@ -87,7 +94,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_lesson_has_in_class_assignments
-    assert_equal "lesson 1", @assignment1.lessons.first.name
+    assert_equal "lesson 1", @assignment1.lessons_in.first.name
     assert_equal "assignment 1", @lesson1.in_class_assignment.name
   end
 
@@ -120,12 +127,15 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_email_unique
-    p @user.errors.full_messages
-    # user = User.create(first_name: "crash", last_name: "dummy", email: @user.email)
-    # refute user.save
-    # assert user.errors.full_messages.include?("Email has already been taken")
-    #
-    # p user
+    unique_user = User.create(first_name: "luke", last_name: "skywalker", email: "jedi@theforce.com")
+    assert unique_user.valid?, @user.errors.full_messages
+    user = User.create(first_name: "crash", last_name: "dummy", email: @user.email)
+    refute user.save
+    assert user.errors.full_messages.include?("Email has already been taken")
+  end
+
+  def test_email_appropriate_form
+    
   end
 
   def test_that_lessons_have_names
