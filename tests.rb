@@ -29,8 +29,8 @@ class ApplicationTest < Minitest::Test
 
     @school = School.find_or_create_by(name: "school")
 
-    @term1 ||= Term.find_or_create_by(name: "fall", school: @school, starts_on: 5, ends_on: 12)
-    @term2 ||= Term.find_or_create_by(name: "spring", school: @school, starts_on: 2, ends_on: 10)
+    @term1 = Term.find_or_create_by(name: "fall", school: @school, starts_on: 5, ends_on: 12)
+    @term2 = Term.find_or_create_by(name: "spring", school: @school, starts_on: 2, ends_on: 10)
 
     @course1 = Course.find_or_create_by(name: "course 1", term: @term1)
     @course2 = Course.find_or_create_by(name: "course 2", term: @term1)
