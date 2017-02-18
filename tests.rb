@@ -166,12 +166,12 @@ class ApplicationTest < Minitest::Test
     refute s.save
   end
 
-  # def test_courses_have_coursecodes_and_names
-  #   c = Course.new
-  #   r = @course1
-  #   refute c.save
-  #   assert r.save
-  # end
+  def test_courses_have_coursecodes_and_names
+    c = Course.new
+    r = @course1
+    refute c.save
+    assert r.save
+  end
 
   def test_course_code_unique
     psy101 = Course.new(name: "course 1", term: @term1, course_code: "psy101")
