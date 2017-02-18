@@ -2,8 +2,8 @@ require 'pry'
 class MyPetOceanTest < Minitest::Test
 
   def setup
-    @school = School.create!
-    @term = Term.create!(school_id: @school.id)
+    @school = School.create!(name: 'school')
+    @term = Term.create!(school_id: @school.id, name: 'term', starts_on: '1989-10-01', ends_on: '1999-12-31')
     @course = Course.create!(term_id: @term.id)
     @course_student = CourseStudent.create!(course_id: @course.id)
     @assignment = Assignment.create!(course_id: @course.id, name: 'Destroy C-138', percent_of_grade: '89')
