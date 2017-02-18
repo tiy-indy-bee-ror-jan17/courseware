@@ -25,85 +25,65 @@ class ApplicationTest < Minitest::Test
 
 
   def setup
-    @user = User.create(first_name: "never", last_name: "nude", email: "email@email.com" )
-    @school = School.create(name: "school")
+    @user = User.find_or_create_by(first_name: "never", last_name: "nude", email: "email@email.com" )
 
-    @term1 = Term.create(name: "fall", school: @school, starts_on: 5, ends_on: 12)
-    @term2 = Term.create(name: "spring", school: @school, starts_on: 2, ends_on: 10)
+    @school = School.find_or_create_by(name: "school")
 
-    @course1 = Course.create(name: "course 1", term: @term1, course_code: "Phil")
-    @course2 = Course.create(name: "course 2", term: @term1, course_code: "Dave")
+    @term1 = Term.find_or_create_by(name: "fall", school: @school, starts_on: 5, ends_on: 12)
+    @term2 = Term.find_or_create_by(name: "spring", school: @school, starts_on: 2, ends_on: 10)
 
-    @course_instructor1 = CourseInstructor.create(course: @course1)
-    @course_instructor2 = CourseInstructor.create(course: @course1)
+    @course1 = Course.find_or_create_by(name: "course 1", term: @term1, course_code: "Phil")
+    @course2 = Course.find_or_create_by(name: "course 2", term: @term1, course_code: "Dave")
 
-    @course_student1 = CourseStudent.create(course: @course1)
-    @course_student2 = CourseStudent.create(course: @course1)
+    @course_instructor1 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: 23)
+    @course_instructor2 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: 34)
 
-    @assignment1 = Assignment.create(name: "assignment 1", course: @course1)
-    @assignment2 = Assignment.create(name: "assignment 2", course: @course1)
+    @course_student1 = CourseStudent.find_or_create_by(course: @course1, student_id: 15)
+    @course_student2 = CourseStudent.find_or_create_by(course: @course1, student_id: 23)
 
-    @lesson1 = Lesson.create(name: "lesson 1", course: @course1, in_class_assignment: @assignment1)
-    @lesson2 = Lesson.create(name: "lesson 2", course: @course1)
+    @assignment1 = Assignment.find_or_create_by(name: "assignment 1", course: @course1, percent_of_grade: 0.72)
+    @assignment2 = Assignment.find_or_create_by(name: "assignment 2", course: @course1, percent_of_grade: 0.86)
+    @assignment3 = Assignment.find_or_create_by(name: "assignment 3", course: @course2, percent_of_grade: 0.25)
 
-    @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
-    @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1, order_number: 2, url: "http://google.com")
+    @lesson1 = Lesson.find_or_create_by(name: "lesson 1", course: @course1, in_class_assignment: @assignment1)
+    @lesson2 = Lesson.find_or_create_by(name: "lesson 2", course: @course1)
+
+    @reading1 = Reading.find_or_create_by(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
+    @reading2 = Reading.find_or_create_by(caption: "reading 2", lesson: @lesson1, order_number: 2, url: "http://google.com")
   end
 
-  def test_truth_and_like______everything_else_too
-    assert true
-    lessons_has_reading
-    lessons_has_courses
-    courseinstructor_has_courses
-    school_has_terms
-    terms_have_courses
-    courses_have_course_students
-    that_course_has_assignments
-    lesson_has_in_class_assignments
-    course_has_many_readings_through_lessons
-    validate_school_has_name
-    validate_terms_have_name_startson_endon_and_schoolid
-    validate_user_has_firstname_lastname_email
-    email_unique
-    that_lessons_have_names
-    that_readings_must_have_ordernumber_lessonid_and_url
-    readings_urls_start_with_hypertext_transfer_protocol
-    courses_have_coursecodes_and_names
-    course_code_unique
-  end
 
-  def lessons_has_reading
-    assert_equal 2, @lesson1.readings.length
+  def test_lessons_has_reading
+    assert @lesson1.readings.length > 1
     assert_equal "lesson 1", @reading1.lesson.name
   end
 
-  def lessons_has_courses
-    assert_equal 2, @course1.lessons.length
+  def test_lessons_has_courses
+    assert @course1.lessons.length > 1
     assert_equal "course 1", @lesson1.course.name
   end
 
-  def courseinstructor_has_courses
-    assert_equal 2, @course1.course_instructors.length
+  def test_courseinstructor_has_courses
+    assert @course1.course_instructors.length > 1, @course1.course_instructors.length
     assert_equal "course 1", @course_instructor1.course.name
   end
 
-  def school_has_terms
-    assert_equal 2, @school.terms.length
+  def test_school_has_terms
+    assert @school.terms.length > 1
     assert_equal "fall", @school.terms.first.name
   end
 
-  def terms_have_courses
-    assert_equal 2, @term1.courses.length
+  def test_terms_have_courses
+    assert @term1.courses.length > 1
     assert_equal "course 1", @term1.courses.last.name
   end
 
-  def courses_have_course_students
-    assert_equal 2, @course1.course_students.length
+  def test_courses_have_course_students
+    assert @course1.course_students.length > 1, @course1.course_students.length
   end
 
-  def that_course_has_assignments
-    assert_equal 2, @course1.assignments.length
-    assert_equal "assignment 1", @course1.assignments.first.name
+  def test_that_course_has_assignments
+    assert @course1.assignments.length > 1
   end
 
   def lesson_has_in_class_assignments
@@ -111,18 +91,19 @@ class ApplicationTest < Minitest::Test
     assert_equal "assignment 1", @lesson1.in_class_assignment.name
   end
 
-  def course_has_many_readings_through_lessons
-    assert_equal 2, @course1.readings.length
-    assert_equal 1, @reading1.courses.length
+  def test_course_has_many_readings_through_lessons
+    assert @course1.readings.length > 1
+    assert @reading1.courses.length > 0
+
   end
 
-  def validate_school_has_name
+  def test_validate_school_has_name
     school = School.new
     refute school.save
     assert school.errors.full_messages.include?("Name can't be blank")
   end
 
-  def validate_terms_have_name_startson_endon_and_schoolid
+  def test_validate_terms_have_name_startson_endon_and_schoolid
     term = Term.new
     refute term.save
     assert term.errors.full_messages.include?("Name can't be blank")
@@ -131,7 +112,7 @@ class ApplicationTest < Minitest::Test
     assert term.errors.full_messages.include?("School can't be blank")
   end
 
-  def validate_user_has_firstname_lastname_email
+  def test_validate_user_has_firstname_lastname_email
     user = User.new
     refute user.save
     assert user.errors.full_messages.include?("First name can't be blank")
@@ -139,25 +120,33 @@ class ApplicationTest < Minitest::Test
     assert user.errors.full_messages.include?("Email can't be blank")
   end
 
-  def email_unique
-    unique_user = User.create(first_name: "anakin", last_name: "skywalker", email: "darklord@theforce.com")
+  def test_email_unique
+    assert @user.valid?
+    unique_user = User.create(first_name: "luke", last_name: "skywalker", email: "jedi@theforce.com")
     assert unique_user.valid?, unique_user.errors.full_messages
     user = User.create(first_name: "crash", last_name: "dummy", email: unique_user.email)
     refute user.save
     assert user.errors.full_messages.include?("Email has already been taken")
   end
 
-  def email_appropriate_form
-
+  def test_email_appropriate_form
+    user1 = User.create(first_name: "ben", last_name: "1", email: "bademail")
+    user2 = User.create(first_name: "kendrick", last_name: "2", email: "another bad email @stupidmail.com")
+    user3 = User.create(first_name: "never", last_name: "nude", email: "awesome@email.com")
+    assert user1.errors.full_messages.include?("Email is bad juju")
+    assert user2.errors.full_messages.include?("Email is bad juju")
+    assert user3.valid?
+    refute user1.valid?
+    refute user2.valid?
   end
 
-  def that_lessons_have_names
+  def test_that_lessons_have_names
     l = Lesson.new
     refute l.save
     assert l.errors.full_messages.include?("Name can't be blank")
   end
 
-  def that_readings_must_have_ordernumber_lessonid_and_url
+  def test_that_readings_must_have_ordernumber_lessonid_and_url
     r = Reading.new
     refute r.save
     assert r.errors.full_messages.include?("Order number can't be blank")
@@ -166,7 +155,7 @@ class ApplicationTest < Minitest::Test
   end
 
 
-  def readings_urls_start_with_hypertext_transfer_protocol
+  def test_readings_urls_start_with_hypertext_transfer_protocol
     u = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "https://google.com")
     r = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
     l = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "anything else")
@@ -177,31 +166,48 @@ class ApplicationTest < Minitest::Test
     refute s.save
   end
 
-  def courses_have_coursecodes_and_names
-    c = Course.new
-    r = @course1
-    refute c.save
-    assert r.save
-  end
+  # def test_courses_have_coursecodes_and_names
+  #   c = Course.new
+  #   r = @course1
+  #   refute c.save
+  #   assert r.save
+  # end
 
-  def course_code_unique
+  def test_course_code_unique
     psy101 = Course.new(name: "course 1", term: @term1, course_code: "psy101")
     not_og = Course.new(name: "this won't work", term: @term1, course_code: psy101.course_code)
     assert psy101.save
     refute not_og.save
   end
 
-
-  def validate_photo_url_starts_with_http
+  def test_validate_photo_url_starts_with_http
+    user1 = User.create(first_name: "dave", last_name: "nevernude", email: "dave@nevernude.com", photo_url: "https:nevernudephotos")
+    user2 = User.create(first_name: "phil", last_name: "nevernude", email: "phil@nevernude.com", photo_url: "http://nevernudephotos")
+    user3 = User.create(first_name: "george", last_name: "michael", email: "georgemichael@arresteddev.com", photo_url: "https://maybe")
+    assert user1.errors.full_messages.include?("Photo url is bad potato")
+    assert user2.valid?, user1.errors.full_messages
+    assert user3.valid?, user1.errors.full_messages
 
   end
 
-  def validate_assignments_have_courseid_name_percentofgrade
-
+  def test_validate_assignments_have_courseid_name_percentofgrade
+    assignment = Assignment.new
+    refute assignment.save
+    assert assignment.errors.full_messages.include?("Name can't be blank")
+    assert assignment.errors.full_messages.include?("Course can't be blank")
+    assert assignment.errors.full_messages.include?("Percent of grade can't be blank")
   end
 
-  def validate_assignment_name_unique_within_courseid
+  def test_validate_assignment_name_unique_within_courseid
 
+    assert @assignment1.valid?, @assignment1.errors.full_messages
+    assert @assignment2.valid?
+    assert @assignment3.valid?
+    assignmentdup = Assignment.create(name: "assignment 1", course: @course1, percent_of_grade: 0.16)
+    refute assignmentdup.valid?
+    assignment_1again = Assignment.create(name: "assignment 1", course: @course2, percent_of_grade: 0.34)
+    assert assignment_1again.valid?, assignment_1again.errors.full_messages
+    assignment_1again.destroy
   end
 
 end
