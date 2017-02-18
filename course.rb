@@ -10,7 +10,7 @@ class Course < ActiveRecord::Base
 
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
 
-  validates :course_code, presence: true, uniqueness: true
+  validates :course_code, presence: true, uniqueness: true, format: {with: /\A[a-z]{3}\d{3}/i}
 
   # Magic number also used in old? method below.
   scope :active, -> { includes(:term).where("terms.ends_on >= ?", Time.now - 1.month) }
