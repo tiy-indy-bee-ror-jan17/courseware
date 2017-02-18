@@ -26,6 +26,10 @@ class ApplicationTest < Minitest::Test
 
   def setup
     @user = User.find_or_create_by(first_name: "never", last_name: "nude", email: "email@email.com" )
+    @student1 = User.find_or_create_by(first_name: "student", last_name: "one", email: "one@student.com" )
+    @student2 = User.find_or_create_by(first_name: "student", last_name: "two", email: "two@student.com" )
+    @instructor1 = User.find_or_create_by(first_name: "instructor", last_name: "one", email: "one@instructor.com" )
+    @instructor2 = User.find_or_create_by(first_name: "instructor", last_name: "two", email: "two@instructor.com" )
 
     @school = School.find_or_create_by(name: "school")
 
@@ -35,11 +39,11 @@ class ApplicationTest < Minitest::Test
     @course1 = Course.find_or_create_by(name: "course 1", term: @term1)
     @course2 = Course.find_or_create_by(name: "course 2", term: @term1)
 
-    @course_instructor1 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: 23)
-    @course_instructor2 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: 34)
+    @course_instructor1 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: @instructor1.id)
+    @course_instructor2 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: @instructor2.id)
 
-    @course_student1 = CourseStudent.find_or_create_by(course: @course1, student_id: 15)
-    @course_student2 = CourseStudent.find_or_create_by(course: @course1, student_id: 23)
+    @course_student1 = CourseStudent.find_or_create_by(course: @course1, student_id: @student1)
+    @course_student2 = CourseStudent.find_or_create_by(course: @course1, student_id: @student1)
 
     @assignment1 = Assignment.find_or_create_by(name: "assignment 1", course: @course1, percent_of_grade: 0.72)
     @assignment2 = Assignment.find_or_create_by(name: "assignment 2", course: @course1, percent_of_grade: 0.86)
@@ -204,6 +208,12 @@ class ApplicationTest < Minitest::Test
     assignment_1again = Assignment.create(name: "assignment 1", course: @course2, percent_of_grade: 0.34)
     assert assignment_1again.valid?, assignment_1again.errors.full_messages
     assignment_1again.destroy
+  end
+
+  #Adventure tests
+
+  def test_associate_coursestudents_with_users
+    @student1
   end
 
 end
