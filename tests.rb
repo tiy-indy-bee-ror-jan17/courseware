@@ -85,7 +85,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_assignments_are_deleted_with_course
-    assingment = Assignment.create(name: "Intermix Chamber", course: @course_two)
+    Assignment.create(name: "Intermix Chamber", course: @course_two)
     @course_two.destroy
     refute Assignment.exists?(name: "Intermix Chamber")
   end
