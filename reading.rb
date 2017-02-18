@@ -1,7 +1,7 @@
 class Reading < ActiveRecord::Base
 
   belongs_to :lesson
-
+  has_many :courses, through: :lessons
 
 # Validate that Readings must have an order_number, a lesson_id, and a url.
   validates   :order_number, presence: true

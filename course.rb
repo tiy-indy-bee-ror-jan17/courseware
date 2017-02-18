@@ -4,6 +4,8 @@ class Course < ActiveRecord::Base
   belongs_to      :instructor
   has_many        :course_students, dependent: :restrict_with_error
   has_many        :assignments, dependent: :destroy
+  has_many        :readings, through: :lessons
+  has_many        :lessons
 
   validates       :course_code, presence: true
   validates       :name, presence: true

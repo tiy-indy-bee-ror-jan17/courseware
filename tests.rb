@@ -30,7 +30,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_school_has_a_term
-    school = School.create
+    school = School.create(name: "asdf")
     term = Term.new
     school.terms << term
     assert school.terms.count > 0
@@ -89,7 +89,7 @@ class ApplicationTest < Minitest::Test
   # When a course is destroyed, its assignments should be automatically destroyed.
   def test_course_destroyed_means_assignments_destroyed
     course = Course.create
-    assignment = Assignment.new
+    assignment = Assignment.new(course_id: 1, name: "asdf", percent_of_grade: 0.1)
     course.assignments << assignment
     course.destroy
     assert course.assignments.count == 0
@@ -106,7 +106,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_assignment_responds_to_lesson
-    a = Assignment.new
+    a = Assignment.new(course_id: 1, name: "asdf", percent_of_grade: 0.1)
     assert a.respond_to?(:lessons)
   end
 
@@ -140,10 +140,9 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_school_course_through_terms
-    school = School.create
+    school = School.create(name: "asdf")
     refute school.errors.any?
     term1  = Term.create
-    refute term1.errors.any?
     course = Course.create(
       course_code: 101,
       name: "Ruby"
@@ -191,19 +190,32 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_lessons_to_in_class_assignments
-    new_assignment = Assignment.create
-    lesson = Lesson.create(in_class_assignment_id: new_assignment.id)
-    assert lesson.respond_to?(:in_class_assignment)
+    new_assignment = Assignment.create(course_id: 1, name: "asdf", percent_of_grade: 0.1)
+    new_lesson = Lesson.create(in_class_assignment_id: new_assignment.id)
+    assert new_lesson.respond_to?(:in_class_assignment)
   end
 
   def test_in_class_assignments_to_lessons
-    new_assignment = Assignment.create
+    new_assignment = Assignment.create(course_id: 1, name: "asdf", percent_of_grade: 0.1)
     new_lesson = Lesson.create(name: "asdfa", in_class_assignment_id: new_assignment.id)
-    assert new_lesson.in_class_assignment == new_assignment
-
+    assert new_lesson.in_class_assignment_id == new_assignment.id
   end
 
-  def test_lessons_to_preclass_assignments
+  def test_there_are_many_readings_through_a_lesson
+  new_course = Course.create(course_code: "123", name: "asdf")
+  new_lesson = Lesson.create(name: "asdfa", course_id: new_course.id)
+  new_reading = Reading.create(lesson_id:  new_lesson.id, order_number: 1, url: "as")
+  new_course.lessons << new_lesson
+  # assert new_course.save
+
+  # p new_course.lessons.class
+  # puts "\n\n"
+  # p new_lesson.readings.class
+  # puts "\n\n"
+  # p new_course.readings.class
+  # puts "\n\n"
+  new_lesson.readings << new_reading
+  assert new_course.readings.first == new_reading, new_course.readings.inspect
 
   end
 
