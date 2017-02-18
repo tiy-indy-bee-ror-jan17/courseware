@@ -9,14 +9,12 @@ class AssignmentTest < MiniTest::Test
 
   def test_assignments_have_course_id_and_name_and_percent_of_grade
     assignment1 = Assignment.create(course_id: @course.id, name: 'Destroy C-137', percent_of_grade: '89')
-    assignment2 = Assignment.create(name: 'Kill All Humans', percent_of_grade: '94')
-    assignment3 = Assignment.create(course_id: @course.id, percent_of_grade: '66')
-    assignment4 = Assignment.create(course_id: @course.id, name: 'Gazorpazorpfield')
+    assignment2 = Assignment.create
 
     assert assignment1.valid?
-    assert assignment2.invalid?
-    assert assignment3.invalid?
-    assert assignment4.invalid?
+    assert assignment2.errors.full_messages.include?("Course can't be blank")
+    assert assignment2.errors.full_messages.include?("Name can't be blank")
+    assert assignment2.errors.full_messages.include?("Percent of grade can't be blank")
   end
 
   def test_assignment_name_is_unique_within_given_course_id
@@ -28,7 +26,7 @@ class AssignmentTest < MiniTest::Test
 
     assert assignment1.valid?
     assert assignment2.valid?
-    assert assignment3.invalid?
+    assert assignment3.errors.full_messages.include?("Name has already been taken")
     assert assignment4.valid?
   end
 
