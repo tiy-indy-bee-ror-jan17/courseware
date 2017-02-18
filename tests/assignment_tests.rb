@@ -1,5 +1,9 @@
 class AssignmentTest < MiniTest::Test
 
+  def setup
+    @course = Course.create
+  end
+
   def test_assignments_have_course_id_and_name_and_percent_of_grade
     course = Course.create
     assignment1 = Assignment.create(course_id: course.id, name: 'Destroy C-137', percent_of_grade: '89')

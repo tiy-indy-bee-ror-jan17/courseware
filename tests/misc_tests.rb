@@ -2,8 +2,7 @@ require 'pry'
 
 class ApplicationTest < Minitest::Test
 
-  def test_truth
-    assert true
+  def setup
   end
 
   def test_a_lesson_has_readings
@@ -28,17 +27,34 @@ class ApplicationTest < Minitest::Test
     assert lesson.course
   end
 
+  def test_lessons_are_destroyed_when_their_course_is_destroyed
+    course = Course.create
+    lesson = Lesson.create(course_id: course.id)
+    course.destroy
+    assert course.destroy
+    refute Lesson.find_by(course_id: course.id)
+  end
+
   def test_courses_have_course_instructors
     course = Course.create
     instructor = CourseInstructor.create(course_id: course.id)
     assert course.course_instructors.length == 1
   end
 
-  def test_a_lesson_has_in_class_assignments
+  def test_course_cannot_be_deleted_when_it_has_course_instructor
+    course = Course.create
+    instructor = CourseInstructor.create(course_id: course.id)
+    course.destroy
+    refute course.destroy
+    assert_equal 1, course.course_instructors.count
+  end
+
+  def test_a_lesson_has_in_class_assignments_and_in_class_assignments_are_linked_to_lessons
     course = Course.create
     ica = Assignment.create(course_id: course.id, name: 'Go Cats', percent_of_grade: '89')
     lesson = Lesson.create(in_class_assignment_id: ica.id)
-    refute lesson.in_class_assignment.nil?
+    assert lesson.respond_to?(:in_class_assignment)
+    assert_equal 1, ica.lessons.count
   end
 
   def test_a_course_has_readings_through_lessons
@@ -50,16 +66,18 @@ class ApplicationTest < Minitest::Test
 
   def test_a_school_must_have_a_name
     school = School.new(name: 'UNL')
+    school2 = School.new
     assert school.save
+    refute school2.save
   end
 
   def test_terms_must_have_name_and_starts_on_and_ends_on_and_school_id
-    school = School.create
-    term1 = Term.new
-    term2 = Term.new(name: 'Phrasing')
-    term3 = Term.new(name: 'Mawp', starts_on: '2016-01-01')
-    term4 = Term.new(name: 'Rampage', starts_on: '2017-01-01', ends_on: '2017-01-10')
-    term5 = Term.new(name: 'Ugly Duckling', starts_on: '2017-01-01', ends_on: '2017-01-05', school_id: school.id)
+    school = School.create(name: 'school')
+    term1 = Term.create
+    term2 = Term.create(name: 'Phrasing')
+    term3 = Term.create(name: 'Mawp', starts_on: '2016-01-01')
+    term4 = Term.create(name: 'Rampage', starts_on: '2017-01-01', ends_on: '2017-01-10')
+    term5 = Term.create(name: 'Ugly Duckling', starts_on: '2017-01-01', ends_on: '2017-01-05', school_id: school.id)
 
     refute term1.save
     refute term2.save
@@ -77,8 +95,11 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_a_course_has_one_primary_instructor
-    
-    #primary_instructor will be a foreign key
+    course = Course.create
+    user = User.create(first_name: 'Sammy', last_name: 'Meow', email: 'sammy@meow.com')
+    instructor = CourseInstructor.create(instructor_id: user.id, course_id: course.id, primary: true)
+
+    assert course.primary_instructor == instructor    # instructor instance == instructor instance
   end
 
 end
