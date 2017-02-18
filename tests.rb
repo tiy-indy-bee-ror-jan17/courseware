@@ -31,14 +31,16 @@ class ApplicationTest < Minitest::Test
     @course_two = Course.create(name: "Basic Warp Design", term: @term, course_code: "ncc74210")
     @course_student = CourseStudent.create(course: @course)
     @course_student_two = CourseStudent.create(course: @course)
-    @assignment = Assignment.create(course: @course)
-    @assignment_two = Assignment.create(course: @course)
+    @assignment = Assignment.create(course: @course, active_at: "1933-01-23", due_at: "1989-11-20")
+    @assignment_two = Assignment.create(course: @course, active_at: "1947-07-20", due_at: "1982-08-15")
+    @assignment_three = Assignment.create(course: @course, active_at: "1954-05-10", due_at: "1989-11-20")
     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
-    @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment)
+    @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment, parent_lesson: @lesson)
+    @lesson_three = Lesson.create(name: "Third Lesson", parent_lesson: @lesson)
     @user = User.create
     @assignment_grade = AssignmentGrade.create(assignment: @assignment)
     @assignment_grade_two = AssignmentGrade.create(assignment: @assignment)
-    @course_instructor = CourseInstructor.create(course: @course)
+    @course_instructor = CourseInstructor.create(course: @course, instructor: @user)
     @course_instructor2 = CourseInstructor.create(course: @course)
   end
 
@@ -83,7 +85,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_courses_have_many_assignments
-    assert_equal 2, @course.assignments.length
+    assert_equal 3, @course.assignments.length
   end
 
   def test_assignment_belongs_to_course
@@ -163,8 +165,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_course_instructor_belongs_to_instructor
-    course_instructor = CourseInstructor.create(instructor: @user)
-    assert course_instructor.instructor == @user
+    assert @course_instructor.instructor == @user
   end
 
   def test_assignment_has_many_assignment_grades
@@ -186,26 +187,16 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_assignments_are_ordered_by_due_at_then_active_at
-    course = Course.create(name: "Klingon Physiology", course_code: "ncc150")
-    assignment = Assignment.create(course: course, active_at: "1933-01-23", due_at: "1989-11-20")
-    assignment_two = Assignment.create(course: course, active_at: "1947-07-20", due_at: "1982-08-15")
-    assignment_three = Assignment.create(course: course, active_at: "1954-05-10", due_at: "1989-11-20")
-    assert_equal [assignment_two, assignment, assignment_three], course.assignments.to_a
+    assert_equal [@assignment_two, @assignment, @assignment_three], @course.assignments.to_a
   end
 
   def test_lesson_has_many_child_lessons
-    lesson = Lesson.create(name: "Test Lesson")
-    lesson_two = Lesson.create(name: "Test Lesson 2", parent_lesson: lesson)
-    lesson_three = Lesson.create(name: "Test Lesson 3", parent_lesson: lesson)
-    assert_equal [lesson_two, lesson_three], lesson.child_lessons.to_a
+    assert_equal [@lesson_two, @lesson_three], @lesson.child_lessons.to_a
   end
 
   def test_child_lessons_belong_to_parent_lesson
-    lesson = Lesson.create(name: "Test Lesson")
-    lesson_two = Lesson.create(name: "Test Lesson 2", parent_lesson: lesson)
-    lesson_three = Lesson.create(name: "Test Lesson 3", parent_lesson: lesson)
-    assert_equal lesson, lesson_two.parent_lesson
-    assert_equal lesson, lesson_three.parent_lesson
+    assert_equal @lesson, @lesson_two.parent_lesson
+    assert_equal @lesson, @lesson_three.parent_lesson
   end
 
 # End Person A Tests
