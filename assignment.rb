@@ -7,6 +7,7 @@ class Assignment < ActiveRecord::Base
 
   validate :cannot_be_due_before_active
 
+  default_scope { order("assignments.due_at, assignments.active_at") }
 
   scope :active_for_students, -> { where("active_at <= ? AND due_at >= ? AND students_can_submit = ?", Time.now, Time.now, true) }
 
