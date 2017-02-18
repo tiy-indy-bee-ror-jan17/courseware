@@ -196,7 +196,6 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_validate_assignment_name_unique_within_courseid
-
     assert @assignment1.valid?
     assert @assignment2.valid?
     assert @assignment3.valid?
