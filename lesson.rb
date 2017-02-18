@@ -1,12 +1,13 @@
 class Lesson < ActiveRecord::Base
 
   belongs_to :pre_class_assignment, class_name: "Assignment", foreign_key: "pre_class_assignment_id"
-  delegate :code_and_name, to: :course, prefix: true
-  validates :name, presence: true
-
-  has_many :readings, dependent: :destroy
   belongs_to :in_class_assigments, foreign_key: "in_class_assignment_id", class_name: "Assignment"
   belongs_to :course
+  has_many :readings, dependent: :destroy
+
+  delegate :code_and_name, to: :course, prefix: true
+  
+  validates :name, presence: true
 
   scope :roots, -> { where("parent_lesson_id IS NULL") }
   scope :without_day_assignments, -> { where("day_assignment_id IS NULL") }
