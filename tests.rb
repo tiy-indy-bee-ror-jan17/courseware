@@ -123,7 +123,9 @@ class ApplicationTest < Minitest::Test
                        email: "test@used.com",
                        instructor: true)
     course = Course.create()
-    course_instructor = CourseInstructor.create(course_id: course.id, instructor_id: user.id)
+    course_instructor = CourseInstructor.create(
+                                          course_id: course.id,
+                                          instructor_id: user.id)
     # p course
     # p course_instructor
     # puts "\n"
@@ -261,6 +263,11 @@ class ApplicationTest < Minitest::Test
                          email: "test@users.com",
                          photo_url: "htt://git.com")
       refute user.save
+      user2 = User.create(first_name: "Testy",
+                         last_name: "Usery",
+                         email: "testy@usery.com",
+                         photo_url: "http://git.com")
+      assert user2.save
   end
 
   def test_assignments_have_course_id_name_percent
@@ -359,10 +366,10 @@ class ApplicationTest < Minitest::Test
            course_instructor.course_id == course.id
   end
 
-  # def test_course_students_ordered_last_first_name
-  #   # A Course's students should be ordered by last_name, then
-  #   # first_name.
-  # end
+  def test_course_students_ordered_last_first_name
+    # A Course's students should be ordered by last_name, then
+    # first_name.
+  end
 
 end
 #
