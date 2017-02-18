@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+
+  # has_many :course_students, class_name: "CourseStudent", foreign_key: "student_id"
   # assocations
   has_many :course_students, foreign_key: "student_id"
   has_many :courses, through: :course_students

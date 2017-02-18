@@ -1,5 +1,8 @@
 class Assignment < ActiveRecord::Base
 
+  belongs_to :lesson, foreign_key: "in_class_assignment_id"
+  belongs_to :course
+
   has_many :lesson_assignments,
             class_name: "Lesson",
             foreign_key: "in_class_assignment_id"

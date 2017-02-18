@@ -5,7 +5,7 @@ class CourseStudent < ActiveRecord::Base
   belongs_to :course, class_name: "Course",
                       foreign_key: "course_id"
   has_many :assignment_grades, foreign_key: "id"
-
+  belongs_to :course
 
 
   scope :approved, -> { where(approved: true) }
