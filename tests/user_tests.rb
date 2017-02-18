@@ -1,15 +1,14 @@
 class UserTest < MiniTest::Test
 
-  def test_user_must_have_first_name_and_last_name_and_email
-    user1 = User.new(first_name: 'Alex', last_name: 'Woofsley', email: 'alex@pawtmail.com')
-    user2 = User.new(first_name: 'Sammy', email: 'sammy@meow.com')
-    user3 = User.new(last_name: 'Book', email: 'shepherd@book.com')
-    user4 = User.new(first_name: 'Admiral', last_name: 'Crunch')
+  def setup
+    @user = User.create
+  end
 
-    assert user1.valid?
-    refute user2.valid?
-    refute user3.valid?
-    refute user4.valid?
+  def test_user_must_have_first_name_and_last_name_and_email
+    user = User.create
+    assert user.errors.full_messages.include?("First name can't be blank")
+    assert user.errors.full_messages.include?("Last name can't be blank")
+    assert user.errors.full_messages.include?("Email can't be blank")
   end
 
   def test_user_email_is_unique
@@ -18,7 +17,7 @@ class UserTest < MiniTest::Test
     user3 = User.create(first_name: 'Count', last_name: 'Chocula', email: 'choc@choco.com')
 
     assert user2.valid?
-    refute user3.valid?
+    assert user3.errors.full_messages.include?('Email has already been taken')
   end
 
 
@@ -27,7 +26,7 @@ class UserTest < MiniTest::Test
     user2 = User.create(first_name: 'Red', last_name: 'Mage', email: 'refreshmeplz')
 
     assert user1.valid?
-    refute user2.valid?
+    assert user2.errors.full_messages.include?('Email is invalid')
   end
 
   def test_user_photo_url_begins_correctly
@@ -37,7 +36,21 @@ class UserTest < MiniTest::Test
 
     assert user1.valid?
     assert user2.valid?
-    refute user3.valid?
+    assert user3.errors.full_messages.include?('Photo url is invalid')
   end
+
+  def test_a_course_student_is_associated_with_students
+    student = User.create(first_name: 'Rick', last_name: 'Sanchez', email: 'rick@earthc137.com')
+    cs = CourseStudent.create(student_id: student.id)
+    assert cs.student == student
+  end
+
+  def test_course_student_is_associated_with_assignment_grades
+    cs = CourseStudent.create
+    grade = AssignmentGrade.create(course_student_id: cs.id)
+
+    assert grade.course_student == cs
+  end
+
 
 end
