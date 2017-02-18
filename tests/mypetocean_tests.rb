@@ -4,11 +4,20 @@ class MyPetOceanTest < Minitest::Test
   def setup
     @school = School.create!(name: 'school')
     @term = Term.create!(school_id: @school.id, name: 'term', starts_on: '1989-10-01', ends_on: '1999-12-31')
-    @course = Course.create!(term_id: @term.id)
+    @course = Course.create!(name: 'Catbutt & Other Specist Terms', course_code: '532', term_id: @term.id)
     @course_student = CourseStudent.create!(course_id: @course.id)
     @assignment = Assignment.create!(course_id: @course.id, name: 'Destroy C-138', percent_of_grade: '89')
     @pre_class_assignment = Assignment.create!(course_id: @course.id, name: 'Destroy C-139', percent_of_grade: '89')
     @pre_class_lesson = Lesson.create!(pre_class_assignment_id: @pre_class_assignment.id, name: 'Karl Jaspers')
+    @lesson = Lesson.create!(name: 'Miguel Unamuno')
+    @reading = Reading.create!(lesson_id: @lesson.id, order_number: '2334', url: 'https://www.youtube.com/watch?v=kytC4OOFeSs')
+  end
+
+  def test_uniqueness
+    assert Course.create(name: 'Catbutt & Other Great Things to Call Your Dumbass Friends',
+                         course_code: '532',
+                         term_id: @term.id)
+                 .invalid?
   end
 
   def test_associations
