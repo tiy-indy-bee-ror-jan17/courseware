@@ -1,7 +1,6 @@
 # Basic test requires
 require 'minitest/autorun'
 require 'minitest/pride'
-
 require 'pry'
 
 
@@ -381,5 +380,45 @@ class ApplicationTest < Minitest::Test
     )
     assert course.save
   end
+
+  def test_courseinstructor_associatedwith_instructior
+    user = User.create(
+            first_name: 'Chris',
+            last_name:  'Vannoy',
+            email:      'cvannoy@ironyard.com',
+            photo_url:  'https://www.pix.com'
+            )
+    assert user.save
+    ci   = CourseInstructor.create(
+        instructor_id:  user.id)
+    assert ci.save
+    assert ci.instructor_id == user.id
+  end
+
+  def test_assignment_associatedwith_assignmentgrade
+    assignment = Assignment.create(
+      course_id: 'acp432',
+      name:      'Accelerated Learning',
+      percent_of_grade: 85
+      )
+    assert assignment.save
+    assignment_grade = AssignmentGrade.create
+    assert assignment_grade.save
+    assignment.assignment_grades << assignment_grade
+    assert assignment.assignment_grades.count > 0
+  end
+
+  # Course to have many instructors through the Course's course_instructors.
+  # def test_course_linkedto_courseinstructors
+  #   course = Course.create(
+  #       course_code: 'abw123',
+  #       name: 'Python 871'
+  #       )
+  #   ci   = CourseInstructor.create(
+  #       instructor_id:  user.id)
+  #   assert ci.save
+  #   course.course_instructors << ci
+  #   assert course.course_instructors.count > 0
+  # end
 
 end
