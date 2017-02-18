@@ -1,4 +1,16 @@
 class Course < ActiveRecord::Base
+  belongs_to      :term
+  has_many        :course_students, dependent: :restrict_with_error
+  has_many        :assignments, dependent: :destroy
+#Validate that Courses have a course_code and a name.
+  validates       :course_code, presence: true
+  validates       :name, presence: true
+# Validate that the course_code starts with three letters
+# and ends with three numbers. Use a regular expression.
+# validates
+
+  has_many :course_instructors, dependent: :restrict_with_error
+  has_many :lessons, dependent: :destroy
 
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
 
