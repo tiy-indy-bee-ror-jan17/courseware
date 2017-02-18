@@ -2,6 +2,8 @@ class Assignment < ActiveRecord::Base
 
   belongs_to :course
 
+  has_many :pre_class_lessons, foreign_key: 'pre_class_assignment_id',
+                               class_name: 'Lesson'
   has_many :lessons, foreign_key: 'in_class_assignment_id'
 
   validates :course_id, presence: true

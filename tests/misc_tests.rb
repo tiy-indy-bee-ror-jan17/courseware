@@ -6,7 +6,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_a_lesson_has_readings
-    lesson = Lesson.create
+    lesson = Lesson.create(name: 'Soren Kierkegaard')
     reading = Reading.create(lesson_id: lesson.id)
     assert lesson.readings.count == 1
   end
@@ -22,7 +22,7 @@ class ApplicationTest < Minitest::Test
 
   def test_a_course_has_lessons_and_lessons_belong_to_a_course
     course = Course.create
-    lesson = Lesson.create(course_id: course.id)
+    lesson = Lesson.create(course_id: course.id, name: 'Nikolai Berdyaev')
     assert course.lessons.count == 1
     assert lesson.course
   end
@@ -59,7 +59,7 @@ class ApplicationTest < Minitest::Test
 
   def test_a_course_has_readings_through_lessons
     course = Course.create
-    lesson = Lesson.create(course_id: course.id)
+    lesson = Lesson.create(course_id: course.id, name: 'Lev Shestov')
     reading = Reading.create(lesson_id: lesson.id)
     assert course.readings.count == 1
   end

@@ -1,6 +1,11 @@
 class Course < ActiveRecord::Base
 
+  belongs_to :term
+  has_many :course_instructors, dependent: :restrict_with_error
+  has_many :course_students, dependent: :restrict_with_error
+  has_many :assignments, dependent: :destroy
   has_many :lessons, dependent: :destroy
+
   has_many :course_instructors, dependent: :restrict_with_error
   has_many :readings, through: :lessons
   has_many :assignments
@@ -8,7 +13,6 @@ class Course < ActiveRecord::Base
   has_many :students, through: :course_students
 
   has_one :primary_instructor, ->{ where(primary: true) }, class_name: 'CourseInstructor'
-
 
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
 
