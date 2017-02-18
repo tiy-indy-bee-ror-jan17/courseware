@@ -5,9 +5,18 @@ class Assignment < ActiveRecord::Base
   has_many :lessons, foreign_key: "pre_class_assignment_id"
   has_many :assignment_grades
 
+  validate :cannot_be_due_before_active
+
+
   scope :active_for_students, -> { where("active_at <= ? AND due_at >= ? AND students_can_submit = ?", Time.now, Time.now, true) }
 
   delegate :code_and_name, :color, to: :course, prefix: true
+
+  def cannot_be_due_before_active
+    if due_at.present? && active_at.present? && due_at < active_at
+      errors.add(:due_at, "date cannot be before active at date.")
+    end
+  end
 
   def status(user = nil)
     AssignmentStatus.new(assignment: self, user: user)

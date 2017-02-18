@@ -22,6 +22,7 @@ ApplicationMigration.migrate(:up)
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
+# Person A Tests
   def setup
     @school = School.create(name: "Starfleet Academy")
     @term = Term.create(name: "Fall Term", starts_on: "2004-05-26", ends_on: Date.today, school_id: 1, school: @school)
@@ -181,6 +182,14 @@ class ApplicationTest < Minitest::Test
     course_instructor2 = CourseInstructor.create(course: course)
     assert_equal 2, course.course_instructors.length
   end
+
+  def test_assignment_due_date_is_after_assignment_active_date
+    assignment = Assignment.create(active_at: Date.today, due_at: "1988-05-10")
+    refute assignment.save
+    assert assignment.errors.full_messages.include?("Due at date cannot be before active at date.")
+  end
+
+# End Person A Tests
 
   # B-Test-1
   def test_a_reading_is_destroyed_when_its_lesson_is_destroyed
