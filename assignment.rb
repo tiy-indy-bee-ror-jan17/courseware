@@ -7,7 +7,7 @@ class Assignment < ActiveRecord::Base
   has_many :lessons_pre, class_name: "Lesson", foreign_key: "pre_class_assignment_id"
 
   validates :course_id, presence: true
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: {scope: :course, message: "can't be duplicates in the same course!!"}
   validates :percent_of_grade, presence: true
 
 

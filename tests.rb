@@ -25,29 +25,31 @@ class ApplicationTest < Minitest::Test
 
 
   def setup
-    @user = User.create(first_name: "never", last_name: "nude", email: "email@email.com" )
-    @school = School.create(name: "school")
+    @user = User.find_or_create_by(first_name: "never", last_name: "nude", email: "email@email.com" )
 
-    @term1 = Term.create(name: "fall", school: @school, starts_on: 5, ends_on: 12)
-    @term2 = Term.create(name: "spring", school: @school, starts_on: 2, ends_on: 10)
+    @school = School.find_or_create_by(name: "school")
 
-    @course1 = Course.create(name: "course 1", term: @term1)
-    @course2 = Course.create(name: "course 2", term: @term1)
+    @term1 ||= Term.find_or_create_by(name: "fall", school: @school, starts_on: 5, ends_on: 12)
+    @term2 ||= Term.find_or_create_by(name: "spring", school: @school, starts_on: 2, ends_on: 10)
 
-    @course_instructor1 = CourseInstructor.create(course: @course1)
-    @course_instructor2 = CourseInstructor.create(course: @course1)
+    @course1 = Course.find_or_create_by(name: "course 1", term: @term1)
+    @course2 = Course.find_or_create_by(name: "course 2", term: @term1)
 
-    @course_student1 = CourseStudent.create(course: @course1)
-    @course_student2 = CourseStudent.create(course: @course1)
+    @course_instructor1 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: 23)
+    @course_instructor2 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: 34)
 
-    @assignment1 = Assignment.create(name: "assignment 1", course: @course1, percent_of_grade: 0.72)
-    @assignment2 = Assignment.create(name: "assignment 2", course: @course1, percent_of_grade: 0.86)
+    @course_student1 = CourseStudent.find_or_create_by(course: @course1, student_id: 15)
+    @course_student2 = CourseStudent.find_or_create_by(course: @course1, student_id: 23)
 
-    @lesson1 = Lesson.create(name: "lesson 1", course: @course1, in_class_assignment: @assignment1)
-    @lesson2 = Lesson.create(name: "lesson 2", course: @course1)
+    @assignment1 = Assignment.find_or_create_by(name: "assignment 1", course: @course1, percent_of_grade: 0.72)
+    @assignment2 = Assignment.find_or_create_by(name: "assignment 2", course: @course1, percent_of_grade: 0.86)
+    @assignment3 = Assignment.find_or_create_by(name: "assignment 3", course: @course2, percent_of_grade: 0.25)
 
-    @reading1 = Reading.create(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
-    @reading2 = Reading.create(caption: "reading 2", lesson: @lesson1, order_number: 2, url: "http://google.com")
+    @lesson1 = Lesson.find_or_create_by(name: "lesson 1", course: @course1, in_class_assignment: @assignment1)
+    @lesson2 = Lesson.find_or_create_by(name: "lesson 2", course: @course1)
+
+    @reading1 = Reading.find_or_create_by(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
+    @reading2 = Reading.find_or_create_by(caption: "reading 2", lesson: @lesson1, order_number: 2, url: "http://google.com")
   end
 
   def teardown
@@ -56,40 +58,41 @@ class ApplicationTest < Minitest::Test
 
   def test_truth
     assert true
+    #binding.pry
   end
 
 
   def test_lessons_has_reading
-    assert_equal 2, @lesson1.readings.length
+    assert @lesson1.readings.length > 1
     assert_equal "lesson 1", @reading1.lesson.name
   end
 
   def test_lessons_has_courses
-    assert_equal 2, @course1.lessons.length
+    assert @course1.lessons.length > 1
     assert_equal "course 1", @lesson1.course.name
   end
 
   def test_courseinstructor_has_courses
-    assert_equal 2, @course1.course_instructors.length
+    assert @course1.course_instructors.length > 1, @course1.course_instructors.length
     assert_equal "course 1", @course_instructor1.course.name
   end
 
   def test_school_has_terms
-    assert_equal 2, @school.terms.length
+    assert @school.terms.length > 1
     assert_equal "fall", @school.terms.first.name
   end
 
   def test_terms_have_courses
-    assert_equal 2, @term1.courses.length
+    assert @term1.courses.length > 1
     assert_equal "course 1", @term1.courses.last.name
   end
 
   def test_courses_have_course_students
-    assert_equal 2, @course1.course_students.length
+    assert @course1.course_students.length > 1, @course1.course_students.length
   end
 
   def test_that_course_has_assignments
-    assert_equal 2, @course1.assignments.length
+    assert @course1.assignments.length > 1
     assert_equal "assignment 1", @course1.assignments.first.name
   end
 
@@ -99,8 +102,8 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_course_has_many_readings_through_lessons
-    assert_equal 2, @course1.readings.length
-    assert_equal 1, @reading1.courses.length
+    assert @course1.readings.length > 1
+    assert @reading1.courses.length > 0
   end
 
   def test_validate_school_has_name
@@ -127,6 +130,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_email_unique
+    assert @user.valid?
     unique_user = User.create(first_name: "luke", last_name: "skywalker", email: "jedi@theforce.com")
     assert unique_user.valid?, unique_user.errors.full_messages
     user = User.create(first_name: "crash", last_name: "dummy", email: unique_user.email)
@@ -186,7 +190,6 @@ class ApplicationTest < Minitest::Test
   def test_validate_assignments_have_courseid_name_percentofgrade
     assignment = Assignment.new
     refute assignment.save
-    p assignment.errors.full_messages
     assert assignment.errors.full_messages.include?("Name can't be blank")
     assert assignment.errors.full_messages.include?("Course can't be blank")
     assert assignment.errors.full_messages.include?("Percent of grade can't be blank")
@@ -194,6 +197,14 @@ class ApplicationTest < Minitest::Test
 
   def test_validate_assignment_name_unique_within_courseid
 
+    assert @assignment1.valid?
+    assert @assignment2.valid?
+    assert @assignment3.valid?
+    assignmentdup = Assignment.create(name: "assignment 1", course: @course1, percent_of_grade: 0.16)
+    refute assignmentdup.valid?
+    assignment_1again = Assignment.create(name: "assignment 1", course: @course2, percent_of_grade: 0.34)
+    assert assignment_1again.valid?, assignment_1again.errors.full_messages
+    assignment_1again.destroy
   end
 
 end
