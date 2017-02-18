@@ -24,37 +24,63 @@ ApplicationMigration.migrate(:up)
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
-  debug = false
-  
   def test_school_has_a_term_method
-    school = School.new
+    school = School.create
     assert school.respond_to?(:terms)
   end
 
   def test_school_has_a_term
     school = School.create
-    term = Term.new
+    assert school.save
+    term = Term.create(
+      name: 'Q1-2017',
+      starts_on: '2017-02-01',
+      ends_on:   '2017-04-20',
+      school_id: 1
+    )
+    assert term.save
     school.terms << term
     assert school.terms.count > 0
   end
 
   def test_term_responds_to_school_method
-    term = Term.new
+    term = Term.create
     assert term.respond_to?(:school)
   end
 
-  def test_course_has_a_term_method
-    course = Course.new
-    assert course.respond_to?(:term)
+  def test_term_has_a_course_method
+    term = Term.create(name: "Fall",
+                       starts_on: "01-01-0001",
+                       ends_on: "01-01-0001",
+                       school_id: 1)
+    assert term.save
+    course = Course.create(
+                          course_code: 'abc123',
+                          name: "blah"#,
+                          # term_id: term.id
+                          )
+    term.courses << course
+    assert term.courses.count > 0
   end
 
   def test_term_cannot_be_deleted_if_courses
-    term = Term.new
-    course = Course.new
+    term = Term.create(
+      name: 'Summer 42',
+      starts_on: '2001-01-01',
+      ends_on:   '2001-03-30',
+      school_id:  11
+    )
+    assert term.save
+    course = Course.create(
+      course_code: 'abc129',
+      name: 'Ruby on Rails'
+    )
+    assert course.save
     term.courses << course
-    term.save
-    term.delete
-    assert term.errors,true
+    assert term.courses.count > 0 #verify it has courses
+    assert term.save   #triple verify term still in db
+    term.destroy  #should fail, since still have courses
+    assert term.save   #verify term NOT destroyed
   end
 
   def test_course_responds_to_coursestudents
@@ -69,7 +95,7 @@ class ApplicationTest < Minitest::Test
 
   def test_cannot_delete_course_if_coursestudents
     course = Course.create(
-      course_code: 42,
+      course_code: 'abc133',
       name: "Ruby on Rails"
       )
     coursestudent = CourseStudent.new
@@ -143,14 +169,19 @@ class ApplicationTest < Minitest::Test
 
   def test_school_course_through_terms
     school = School.create
-    refute school.errors.any?
-    term1  = Term.create
-    refute term1.errors.any?
+    assert school.save
+    term1  = Term.create(
+      name: 'Q1-2017',
+      starts_on: '2017-01-01',
+      ends_on:   '2017-04-30',
+      school_id: 1
+    )
+    assert term1.save
     course = Course.create(
-      course_code: 101,
+      course_code: 'abc143',
       name: "Ruby"
       )
-    refute course.errors.any?
+    assert course.save
     school.terms << term1
     term1.courses << course
     assert school.courses.count >= 1
@@ -173,46 +204,73 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_courses_has_course_instructors
-    course = Course.create(name: "1st course", course_code: "asdf")
+    course = Course.create(
+      name: "1st course",
+      course_code: 'abc153')
+    assert course.save
     new_instructor = CourseInstructor.create(course_id: course.id)
-    refute course.course_instructors.count == 0
-    course = Course.create(name: "2nd course", course_code: "zzzz")
-    new_instructor = CourseInstructor.create
-    course = Course.create(name: "3rd course", course_code: "xxxx" )
+    assert new_instructor.save
     course.course_instructors << new_instructor
     refute course.course_instructors.count == 0
-
+    course = Course.create(
+      name: "2nd course",
+      course_code: 'abc163')
+    assert course.save
+    new_instructor = CourseInstructor.create
+    assert new_instructor.save
+    course.course_instructors << new_instructor
+    assert course.course_instructors.count > 0
   end
 
   def test_course_instructors_is_not_deleted_when_course_is_deleted
-    course = Course.create(name: "1st course", course_code: "asdf")
+    term = Term.create(
+      name: 'Q1-1601',
+      starts_on: '1601-05-01',
+      ends_on:   '1601-08-30',
+      school_id: 4
+      )
+      assert term.save
+    course = Course.new(
+      name: "1st course",
+      course_code: 'abc173')
+    term.courses << course
     new_instructor = CourseInstructor.create
     course.course_instructors << new_instructor
-    course.destroy
-    assert course.course_instructors.exists? == true
+    course.destroy      #should fail
+    assert course.save  #verify course still there
   end
 
   def test_lessons_to_in_class_assignments
     new_assignment = Assignment.create
-    lesson = Lesson.create(in_class_assignment_id: new_assignment.id)
+    assert new_assignment.save
+    lesson = Lesson.create(
+      name: 'Rails 101',
+      in_class_assignment_id: new_assignment.id)
+    assert lesson.save
     assert lesson.respond_to?(:in_class_assignment)
   end
 
   def test_in_class_assignments_to_lessons
     new_assignment = Assignment.create
-    new_lesson = Lesson.create(name: "asdfa", in_class_assignment_id: new_assignment.id)
+    new_lesson = Lesson.create(
+      name: "asdfa",
+      in_class_assignment_id:
+      new_assignment.id)
     assert new_lesson.in_class_assignment == new_assignment
   end
 
   def test_preclass_assignments_to_lessons
     new_assignment = Assignment.create
-    new_lesson = Lesson.create(name: "asdfa", pre_class_assignment_id: new_assignment.id)
+    new_lesson = Lesson.create(
+      name: "asdfa",
+      pre_class_assignment_id: new_assignment.id)
     assert new_lesson.pre_class_assignment == new_assignment
   end
 
   def test_validate_Lessons_have_names
     refute Lesson.create.valid?
-    lesson = Lesson.create(name: 'easy')
+    lesson = Lesson.create(
+      name: 'easy')
     assert lesson.save
   end
 
@@ -227,6 +285,75 @@ class ApplicationTest < Minitest::Test
       lesson_id:  3,
       url:  "https://www.valid_url.com"
     ).valid?
+  end
+
+  # Validate that Courses requires both course_code and a name.
+  def test_course_requires_both_course_code_and_name
+    course = Course.create(
+      course_code: 'a1'
+    )
+    refute course.save
+    course = Course.create(
+      name: 'Python 201'
+    )
+    refute course.save
+    course = Course.create(
+      course_code: 'abc183',
+      name: 'Python 201'
+    )
+    assert course.save
+  end
+
+  # Validate that the course_code is unique within a given term_id.
+  def test_coursecode_uniq_within_given_termid
+    term = Term.create(
+      name: 'Q1-1601',
+      starts_on: '1601-05-01',
+      ends_on:   '1601-08-30',
+      school_id: 4
+      )
+    assert term.save
+    course = Course.create(
+      course_code: 'abc193',
+      name: 'Python 201'
+    )
+    assert course.save
+    term.courses << course
+    assert term.courses.count == 1
+    course = Course.new(
+      course_code: 'abc193',
+      name: 'Python 201'
+    )
+    term.courses << course
+    refute term.courses.count == 2
+    course = Course.new(
+      course_code: 'wgc324',
+      name: 'Python 401'
+    )
+    term.courses << course
+    assert term.courses.count == 2
+  end
+
+# Validate course_code starts with three letters
+# and ends with three numbers. Use a regular expression.
+  def test_coursecode_starts_3letters_ends_3numbers
+    term = Term.create(
+      name: 'Q1-1601',
+      starts_on: '1601-05-01',
+      ends_on:   '1601-08-30',
+      school_id: 4
+      )
+    assert term.save
+    course = Course.new(
+      course_code: 'ab123',
+      name: 'Python 301'
+    )
+    refute course.save
+    course = Course.new(
+      course_code: 'abz423',
+      name: 'Python 301'
+    )
+    assert course.save
   end
 
 end
