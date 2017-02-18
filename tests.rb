@@ -180,6 +180,7 @@ class ApplicationTest < Minitest::Test
     course_instructor = CourseInstructor.create(course: course)
     course_instructor2 = CourseInstructor.create(course: course)
     assert_equal 2, course.course_instructors.length
+  end
 
   # B-Test-1
   def test_a_reading_is_destroyed_when_its_lesson_is_destroyed
