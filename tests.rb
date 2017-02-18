@@ -36,8 +36,8 @@ class ApplicationTest < Minitest::Test
     @term1 = Term.find_or_create_by(name: "fall", school: @school, starts_on: 5, ends_on: 12)
     @term2 = Term.find_or_create_by(name: "spring", school: @school, starts_on: 2, ends_on: 10)
 
-    @course1 = Course.find_or_create_by(name: "course 1", term: @term1)
-    @course2 = Course.find_or_create_by(name: "course 2", term: @term1)
+    @course1 = Course.find_or_create_by(name: "course 1", term: @term1, course_code: "Phil")
+    @course2 = Course.find_or_create_by(name: "course 2", term: @term1, course_code: "Dave")
 
     @course_instructor1 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: @instructor1.id)
     @course_instructor2 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: @instructor2.id)
@@ -54,15 +54,6 @@ class ApplicationTest < Minitest::Test
 
     @reading1 = Reading.find_or_create_by(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
     @reading2 = Reading.find_or_create_by(caption: "reading 2", lesson: @lesson1, order_number: 2, url: "http://google.com")
-  end
-
-  def teardown
-
-  end
-
-  def test_truth
-    assert true
-    #binding.pry
   end
 
 
@@ -97,10 +88,9 @@ class ApplicationTest < Minitest::Test
 
   def test_that_course_has_assignments
     assert @course1.assignments.length > 1
-    assert_equal "assignment 1", @course1.assignments.first.name
   end
 
-  def test_lesson_has_in_class_assignments
+  def lesson_has_in_class_assignments
     assert_equal "lesson 1", @assignment1.lessons_in.first.name
     assert_equal "assignment 1", @lesson1.in_class_assignment.name
   end
@@ -108,6 +98,7 @@ class ApplicationTest < Minitest::Test
   def test_course_has_many_readings_through_lessons
     assert @course1.readings.length > 1
     assert @reading1.courses.length > 0
+
   end
 
   def test_validate_school_has_name
@@ -169,16 +160,28 @@ class ApplicationTest < Minitest::Test
 
 
   def test_readings_urls_start_with_hypertext_transfer_protocol
-    u = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://")
-    r = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "https://")
-  #  l = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "anything else")
+    u = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "https://google.com")
+    r = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
+    l = Reading.new(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "anything else")
+    s = Reading.new
     assert u.save
     assert r.save
-    #refute l.save
+    refute l.save
+    refute s.save
   end
 
-  def test_that_readings_must_have_ordernumber_lessonid_and_url
+  # def test_courses_have_coursecodes_and_names
+  #   c = Course.new
+  #   r = @course1
+  #   refute c.save
+  #   assert r.save
+  # end
 
+  def test_course_code_unique
+    psy101 = Course.new(name: "course 1", term: @term1, course_code: "psy101")
+    not_og = Course.new(name: "this won't work", term: @term1, course_code: psy101.course_code)
+    assert psy101.save
+    refute not_og.save
   end
 
   def test_validate_photo_url_starts_with_http
@@ -200,7 +203,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_validate_assignment_name_unique_within_courseid
-    assert @assignment1.valid?
+    assert @assignment1.valid?, @assignment1.errors.full_messages
     assert @assignment2.valid?
     assert @assignment3.valid?
     assignmentdup = Assignment.create(name: "assignment 1", course: @course1, percent_of_grade: 0.16)
