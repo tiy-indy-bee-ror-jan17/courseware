@@ -193,6 +193,21 @@ class ApplicationTest < Minitest::Test
     assert_equal [assignment_two, assignment, assignment_three], course.assignments.to_a
   end
 
+  def test_lesson_has_many_child_lessons
+    lesson = Lesson.create(name: "Test Lesson")
+    lesson_two = Lesson.create(name: "Test Lesson 2", parent_lesson: lesson)
+    lesson_three = Lesson.create(name: "Test Lesson 3", parent_lesson: lesson)
+    assert_equal [lesson_two, lesson_three], lesson.child_lessons.to_a
+  end
+
+  def test_child_lessons_belong_to_parent_lesson
+    lesson = Lesson.create(name: "Test Lesson")
+    lesson_two = Lesson.create(name: "Test Lesson 2", parent_lesson: lesson)
+    lesson_three = Lesson.create(name: "Test Lesson 3", parent_lesson: lesson)
+    assert_equal lesson, lesson_two.parent_lesson
+    assert_equal lesson, lesson_three.parent_lesson
+  end
+
 # End Person A Tests
 
   # B-Test-1

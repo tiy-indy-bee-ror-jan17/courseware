@@ -7,7 +7,7 @@ class Course < ActiveRecord::Base
   has_many :course_instructors, dependent: :restrict_with_error
   has_many :lessons, dependent: :destroy
   has_many :readings, through: :lessons
-  
+
   validates :course_code, :name, presence: true
   validates :course_code, uniqueness: { scope: :term }, format: { with: /\A[a-zA-Z]{3}.*[\d]{3}\z/ }
 
