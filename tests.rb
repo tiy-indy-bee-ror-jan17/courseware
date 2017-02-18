@@ -24,6 +24,8 @@ ApplicationMigration.migrate(:up)
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
+  debug = false
+  
   def test_school_has_a_term_method
     school = School.new
     assert school.respond_to?(:terms)
@@ -134,7 +136,7 @@ class ApplicationTest < Minitest::Test
     reading = Reading.create(
       order_number: 42,
       lesson_id: 43,
-      url:  "www.google.com"
+      url:  "https://www.google.com"
       )
     refute reading.errors.any?
   end
@@ -176,7 +178,7 @@ class ApplicationTest < Minitest::Test
     refute course.course_instructors.count == 0
     course = Course.create(name: "2nd course", course_code: "zzzz")
     new_instructor = CourseInstructor.create
-    course = Course.create(name: "3rd course", course_code: "xxxx")
+    course = Course.create(name: "3rd course", course_code: "xxxx" )
     course.course_instructors << new_instructor
     refute course.course_instructors.count == 0
 
@@ -200,11 +202,31 @@ class ApplicationTest < Minitest::Test
     new_assignment = Assignment.create
     new_lesson = Lesson.create(name: "asdfa", in_class_assignment_id: new_assignment.id)
     assert new_lesson.in_class_assignment == new_assignment
-
   end
 
-  def test_lessons_to_preclass_assignments
+  def test_preclass_assignments_to_lessons
+    new_assignment = Assignment.create
+    new_lesson = Lesson.create(name: "asdfa", pre_class_assignment_id: new_assignment.id)
+    assert new_lesson.pre_class_assignment == new_assignment
+  end
 
+  def test_validate_Lessons_have_names
+    refute Lesson.create.valid?
+    lesson = Lesson.create(name: 'easy')
+    assert lesson.save
+  end
+
+  def test_readings_url_requires_http_or_https
+    refute Reading.create(
+      order_number: 123,
+      lesson_id:  3,
+      url:  "htps://www.invalid_url.com"
+    ).valid?
+    assert Reading.create(
+      order_number: 123,
+      lesson_id:  3,
+      url:  "https://www.valid_url.com"
+    ).valid?
   end
 
 end
