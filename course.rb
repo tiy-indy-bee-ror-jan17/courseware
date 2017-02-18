@@ -4,14 +4,22 @@ class Course < ActiveRecord::Base
   belongs_to      :instructor
   has_many        :course_students, dependent: :restrict_with_error
   has_many        :assignments, dependent: :destroy
+
+  has_many        :readings, through: :lessons
+  has_many        :lessons
+# Validate that the course_code starts with three letters
+# and ends with three numbers. Use a regular expression.
+# validates
+
   cc_regx = /\A[a-z,A-Z]{3,}?.?\d{3,}\z/
   validates       :course_code,
                     presence: true,
-                    uniqueness: { scope: :term_id,
+                    uniqueness: { scope: :term,
                     message: "duplicate course_code in same term"
                     },
                     format: {with: cc_regx}
   validates         :name, presence: true
+
   has_many :course_instructors, dependent: :restrict_with_error
   has_many :lessons, dependent: :destroy
 
