@@ -32,8 +32,8 @@ class ApplicationTest < Minitest::Test
     @term1 = Term.find_or_create_by(name: "fall", school: @school, starts_on: 5, ends_on: 12)
     @term2 = Term.find_or_create_by(name: "spring", school: @school, starts_on: 2, ends_on: 10)
 
-    @course1 = Course.find_or_create_by(name: "course 1", term: @term1, course_code: "Phil")
-    @course2 = Course.find_or_create_by(name: "course 2", term: @term1, course_code: "Dave")
+    @course1 = Course.find_or_create_by(name: "course 1", term: @term1, course_code: "phi101")
+    @course2 = Course.find_or_create_by(name: "course 2", term: @term1, course_code: "dav101")
 
     @course_instructor1 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: 23)
     @course_instructor2 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: 34)
@@ -166,12 +166,12 @@ class ApplicationTest < Minitest::Test
     refute s.save
   end
 
-  # def test_courses_have_coursecodes_and_names
-  #   c = Course.new
-  #   r = @course1
-  #   refute c.save
-  #   assert r.save
-  # end
+  def test_courses_have_coursecodes_and_names
+    c = Course.new
+    r = @course1
+    refute c.save
+    assert r.save
+  end
 
   def test_course_code_unique
     psy101 = Course.new(name: "course 1", term: @term1, course_code: "psy101")
@@ -208,6 +208,16 @@ class ApplicationTest < Minitest::Test
     assignment_1again = Assignment.create(name: "assignment 1", course: @course2, percent_of_grade: 0.34)
     assert assignment_1again.valid?, assignment_1again.errors.full_messages
     assignment_1again.destroy
+  end
+
+  def test_course_code_is_unique_within_given_term_id
+    assert @course1.valid?
+    assert @course2.valid?
+    c_id = Course.create(name: "course 1", term: @term1, course_code: "phi101")
+    refute c_id.valid?
+    c_id2 = Course.create(name: "course 1", term: @term1, course_code: "pho101")
+    assert c_id2.valid?
+    c_id2.destroy
   end
 
 end
