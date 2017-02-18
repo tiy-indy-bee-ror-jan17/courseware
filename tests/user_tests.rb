@@ -16,6 +16,7 @@ class UserTest < MiniTest::Test
     user2 = User.create(first_name: 'Turanga', last_name: 'Fry', email: 'apt1i@leela.com')
     user3 = User.create(first_name: 'Count', last_name: 'Chocula', email: 'choc@choco.com')
 
+    assert user1.valid?
     assert user2.valid?
     assert user3.errors.full_messages.include?('Email has already been taken')
   end

@@ -2,9 +2,12 @@ require 'pry'
 class MyPetOceanTest < Minitest::Test
 
   def setup
+    rand_a_z = -> len=rand(26) { ('a'..'z').to_a.sample(len).join }
+    rand_course_code = -> { rand_a_z.call(3) + rand(100..999).to_s }
+
     @school = School.create!(name: 'school')
     @term = Term.create!(school_id: @school.id, name: 'term', starts_on: '1989-10-01', ends_on: '1999-12-31')
-    @course = Course.create!(name: 'Catbutt & Other Specist Terms', course_code: '532', term_id: @term.id)
+    @course = Course.create!(name: 'Catbutt & Other Specist Terms', course_code: rand_course_code.call, term_id: @term.id)
     @course_student = CourseStudent.create!(course_id: @course.id)
     @assignment = Assignment.create!(course_id: @course.id, name: 'Destroy C-138', percent_of_grade: '89')
     @pre_class_assignment = Assignment.create!(course_id: @course.id, name: 'Destroy C-139', percent_of_grade: '89')
