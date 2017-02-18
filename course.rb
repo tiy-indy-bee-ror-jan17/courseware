@@ -3,7 +3,7 @@ class Course < ActiveRecord::Base
   validates :name, presence: true
   validates :course_code, presence: true,
                           uniqueness: { scope: :term_id } #,
-                          #format: { with: /\A[a-zA-Z]{3}.?\d{3}\z/ }
+                          #format: { with: /\A[a-zA-Z]{3}.+?\d\d\d\z/ }
 
   belongs_to :term
   has_many :course_instructors, dependent: :restrict_with_error
