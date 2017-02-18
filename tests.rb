@@ -35,6 +35,11 @@ class ApplicationTest < Minitest::Test
     @assignment_two = Assignment.create(course: @course)
     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment)
+    @user = User.create
+    @assignment_grade = AssignmentGrade.create(assignment: @assignment)
+    @assignment_grade_two = AssignmentGrade.create(assignment: @assignment)
+    @course_instructor = CourseInstructor.create(course: @course)
+    @course_instructor2 = CourseInstructor.create(course: @course)
   end
 
   def test_truth
@@ -158,29 +163,20 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_course_instructor_belongs_to_instructor
-    user = User.create
-    course_instructor = CourseInstructor.create(instructor: user)
-    assert course_instructor.instructor == user
+    course_instructor = CourseInstructor.create(instructor: @user)
+    assert course_instructor.instructor == @user
   end
 
   def test_assignment_has_many_assignment_grades
-    assignment = Assignment.create
-    assigntment_grade = AssignmentGrade.create(assignment: assignment)
-    assignment_grade_two = AssignmentGrade.create(assignment: assignment)
-    assert_equal 2, assignment.assignment_grades.length
+    assert_equal 2, @assignment.assignment_grades.length
   end
 
   def test_assignment_grade_belongs_to_assignment
-    assignment = Assignment.create
-    assignment_grade = AssignmentGrade.create(assignment: assignment)
-    assert assignment_grade.assignment == assignment
+    assert @assignment_grade.assignment == @assignment
   end
 
   def test_course_has_many_instructors_through_course_instructors
-    course = Course.create(name: "Klingon Physiology", course_code: "ncc150")
-    course_instructor = CourseInstructor.create(course: course)
-    course_instructor2 = CourseInstructor.create(course: course)
-    assert_equal 2, course.course_instructors.length
+    assert_equal 2, @course.course_instructors.length
   end
 
   def test_assignment_due_date_is_after_assignment_active_date
