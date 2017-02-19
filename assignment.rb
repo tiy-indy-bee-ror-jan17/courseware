@@ -19,6 +19,7 @@ class Assignment < ActiveRecord::Base
   delegate :code_and_name, :color, to: :course, prefix: true
 
   def dates_check
+    return if due_at.nil? || active_at.nil?
     errors.add(:due_at, 'cannot be due before it is active') if self.due_at < self.active_at
   end
 

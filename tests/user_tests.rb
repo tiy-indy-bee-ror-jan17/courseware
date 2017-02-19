@@ -1,13 +1,10 @@
 class UserTest < MiniTest::Test
 
-  def setup
-    @user = User.create
-  end
-
   def test_user_must_have_first_name_and_last_name_and_email
-    assert @user.errors.full_messages.include?("First name can't be blank")
-    assert @user.errors.full_messages.include?("Last name can't be blank")
-    assert @user.errors.full_messages.include?("Email can't be blank")
+    user = User.create
+    assert user.errors.full_messages.include?("First name can't be blank")
+    assert user.errors.full_messages.include?("Last name can't be blank")
+    assert user.errors.full_messages.include?("Email can't be blank")
   end
 
   def test_user_email_is_unique
