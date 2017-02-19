@@ -9,7 +9,7 @@ class AssignmentTest < MiniTest::Test
 
   def test_assignments_have_course_id_and_name_and_percent_of_grade
     assignment1 = Assignment.create(course_id: @course.id, name: 'Destroy C-137', percent_of_grade: '89', due_at: '2017-01-18 21:06:59.001', active_at: '2017-01-18 21:06:59.001')
-    assignment2 = Assignment.create(name: 'Kill All Humans', percent_of_grade: '94', due_at: '2017-01-18 21:06:59.001', active_at: '2017-01-18 21:06:59.001')
+    assignment2 = Assignment.create(due_at: '2017-01-18 21:06:59.001', active_at: '2017-01-18 21:06:59.001')
     assignment3 = Assignment.create(course_id: @course.id, percent_of_grade: '66', due_at: '2017-01-18 21:06:59.001', active_at: '2017-01-18 21:06:59.001')
     assignment4 = Assignment.create(course_id: @course.id, name: 'Gazorpazorpfield', due_at: '2017-01-18 21:06:59.001', active_at: '2017-01-18 21:06:59.001')
     assert assignment1.valid?
