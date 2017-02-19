@@ -1,3 +1,4 @@
+require 'pry'
 class Assignment < ActiveRecord::Base
 
   belongs_to :course
@@ -5,14 +6,21 @@ class Assignment < ActiveRecord::Base
   has_many :pre_class_lessons, foreign_key: 'pre_class_assignment_id',
                                class_name: 'Lesson'
   has_many :lessons, foreign_key: 'in_class_assignment_id'
+  has_many :assignment_grades
 
   validates :course_id, presence: true
   validates :name, presence: true, uniqueness: { scope: :course_id }
   validates :percent_of_grade, presence: true
 
+  validate :dates_check
+
   scope :active_for_students, -> { where("active_at <= ? AND due_at >= ? AND students_can_submit = ?", Time.now, Time.now, true) }
 
   delegate :code_and_name, :color, to: :course, prefix: true
+
+  def dates_check
+    errors.add(:due_at, 'cannot be due before it is active') if self.due_at < self.active_at
+  end
 
   def status(user = nil)
     AssignmentStatus.new(assignment: self, user: user)
