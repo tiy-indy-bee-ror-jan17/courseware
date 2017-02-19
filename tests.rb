@@ -25,8 +25,8 @@ class ApplicationTest < Minitest::Test
 
 
   def setup
-    @user = User.find_or_create_by(first_name: "never", last_name: "nude", email: "email@email.com" )
-    @student1 = User.find_or_create_by(first_name: "student", last_name: "one", email: "one@student.com" )
+    @user = User.find_or_create_by(first_name: "never", last_name: "nude", email: "email@email.com", photo_url: "http://nevernudephotos" )
+    @student1 = User.find_or_create_by(first_name: "student", last_name: "one", email: "one@student.com", photo_url: "https://maybe")
     @student2 = User.find_or_create_by(first_name: "student", last_name: "two", email: "two@student.com" )
     @instructor1 = User.find_or_create_by(first_name: "instructor", last_name: "one", email: "one@instructor.com" )
     @instructor2 = User.find_or_create_by(first_name: "instructor", last_name: "two", email: "two@instructor.com" )
@@ -42,8 +42,8 @@ class ApplicationTest < Minitest::Test
     @course_instructor1 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: @instructor1.id)
     @course_instructor2 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: @instructor2.id)
 
-    @course_student1 = CourseStudent.find_or_create_by(course: @course1, student_id: @student1)
-    @course_student2 = CourseStudent.find_or_create_by(course: @course1, student_id: @student1)
+    @course_student1 = CourseStudent.find_or_create_by(course: @course1, student: @student1)
+    @course_student2 = CourseStudent.find_or_create_by(course: @course1, student: @student2)
 
     @assignment1 = Assignment.find_or_create_by(name: "assignment 1", course: @course1, percent_of_grade: 0.72)
     @assignment2 = Assignment.find_or_create_by(name: "assignment 2", course: @course1, percent_of_grade: 0.86)
@@ -54,6 +54,8 @@ class ApplicationTest < Minitest::Test
 
     @reading1 = Reading.find_or_create_by(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
     @reading2 = Reading.find_or_create_by(caption: "reading 2", lesson: @lesson1, order_number: 2, url: "http://google.com")
+
+    @assignment_grade1 = AssignmentGrade.find_or_create_by(course_student: @course_student1, final_grade: 0.92)
   end
 
 
@@ -136,10 +138,9 @@ class ApplicationTest < Minitest::Test
   def test_email_appropriate_form
     user1 = User.create(first_name: "ben", last_name: "1", email: "bademail")
     user2 = User.create(first_name: "kendrick", last_name: "2", email: "another bad email @stupidmail.com")
-    user3 = User.create(first_name: "never", last_name: "nude", email: "awesome@email.com")
     assert user1.errors.full_messages.include?("Email is bad juju")
     assert user2.errors.full_messages.include?("Email is bad juju")
-    assert user3.valid?
+    assert @user.valid?
     refute user1.valid?
     refute user2.valid?
   end
@@ -186,11 +187,10 @@ class ApplicationTest < Minitest::Test
 
   def test_validate_photo_url_starts_with_http
     user1 = User.create(first_name: "dave", last_name: "nevernude", email: "dave@nevernude.com", photo_url: "https:nevernudephotos")
-    user2 = User.create(first_name: "phil", last_name: "nevernude", email: "phil@nevernude.com", photo_url: "http://nevernudephotos")
-    user3 = User.create(first_name: "george", last_name: "michael", email: "georgemichael@arresteddev.com", photo_url: "https://maybe")
     assert user1.errors.full_messages.include?("Photo url is bad potato")
-    assert user2.valid?, user1.errors.full_messages
-    assert user3.valid?, user1.errors.full_messages
+    refute user1.save
+    assert @user.valid?, user1.errors.full_messages
+    assert @student1.valid?, user1.errors.full_messages
 
   end
 
@@ -228,6 +228,20 @@ class ApplicationTest < Minitest::Test
     #Adventure tests
 
   def test_associate_coursestudents_with_users
-    @student1
+    refute_equal 0, @student1.course_students.count
+    assert_equal "one", @course_student1.student.last_name
+  end
+
+  def test_associate_coursestudents_with_assignment_grades
+    refute_equal 0, @course_student1.assignment_grades.count
+    assert @assignment_grade1.respond_to?("course_student")
+  end
+
+  def test_courses_have_many_students_through_course_students
+
+  end
+
+  def test_associate_course_with_one_primary_instructor
+
   end
 end
