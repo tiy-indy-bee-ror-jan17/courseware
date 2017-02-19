@@ -22,6 +22,7 @@ ApplicationMigration.migrate(:up)
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
+# Person A Tests
   def setup
     @school = School.create(name: "Starfleet Academy")
     @term = Term.create(name: "Fall Term", starts_on: "2004-05-26", ends_on: Date.today, school_id: 1, school: @school)
@@ -34,6 +35,11 @@ class ApplicationTest < Minitest::Test
     @assignment_two = Assignment.create(course: @course, name: "Transwarp Initiatives for cleaner space lanes", course_id: @course.id, percent_of_grade: 0.52)
     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment)
+    @user = User.create
+    @assignment_grade = AssignmentGrade.create(assignment: @assignment)
+    @assignment_grade_two = AssignmentGrade.create(assignment: @assignment)
+    @course_instructor = CourseInstructor.create(course: @course)
+    @course_instructor2 = CourseInstructor.create(course: @course)
   end
 
   def test_truth
@@ -85,7 +91,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_assignments_are_deleted_with_course
-    assignment = Assignment.create(name: "Intermix Chamber", course: @course_two)
+    Assignment.create(name: "Intermix Chamber", course: @course_two)
     @course_two.destroy
     refute Assignment.exists?(name: "Intermix Chamber")
   end
@@ -155,6 +161,31 @@ class ApplicationTest < Minitest::Test
     refute course.save
     course.errors.full_messages.include?("Course code is invalid")
   end
+
+  def test_course_instructor_belongs_to_instructor
+    course_instructor = CourseInstructor.create(instructor: @user)
+    assert course_instructor.instructor == @user
+  end
+
+  def test_assignment_has_many_assignment_grades
+    assert_equal 2, @assignment.assignment_grades.length
+  end
+
+  def test_assignment_grade_belongs_to_assignment
+    assert @assignment_grade.assignment == @assignment
+  end
+
+  def test_course_has_many_instructors_through_course_instructors
+    assert_equal 2, @course.course_instructors.length
+  end
+
+  def test_assignment_due_date_is_after_assignment_active_date
+    assignment = Assignment.create(active_at: Date.today, due_at: "1988-05-10")
+    refute assignment.save
+    assert assignment.errors.full_messages.include?("Due at date cannot be before active at date.")
+  end
+
+# End Person A Tests
 
   # B-Test-1
   def test_a_reading_is_destroyed_when_its_lesson_is_destroyed
@@ -349,5 +380,4 @@ class ApplicationTest < Minitest::Test
     assert assignment_not_unique.errors.full_messages.include?("Name has already been taken")
   end
 
-#End of Class
 end

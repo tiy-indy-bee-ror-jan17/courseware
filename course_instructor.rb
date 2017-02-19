@@ -1,6 +1,7 @@
 class CourseInstructor < ActiveRecord::Base
 
-belongs_to :courses
-
+  belongs_to :course
+  belongs_to :instructor, class_name: "User", foreign_key: "instructor_id"
+  belongs_to :courses
 
 end
