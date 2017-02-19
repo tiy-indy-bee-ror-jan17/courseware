@@ -1,7 +1,8 @@
+require 'pry'
 class CourseTest < Minitest::Test
 
   def setup
-    @course = Course.create(course_code: 'course_code')
+    @course = Course.create(name: 'course', course_code: rand_course_code)
     @lesson = Lesson.create(course_id: @course.id, name: 'lesson')
   end
 
@@ -23,7 +24,8 @@ class CourseTest < Minitest::Test
   end
 
   def test_a_course_has_readings_through_lessons
-    reading = Reading.create(lesson_id: @lesson.id)
+    reading = Reading.create(lesson_id: @lesson.id, order_number: '1', url: 'http://url.com')
+    # binding.pry
     assert @course.readings.count == 1
   end
 
@@ -37,7 +39,6 @@ class CourseTest < Minitest::Test
   def test_a_course_has_one_primary_instructor
     user = User.create(first_name: 'Sammy', last_name: 'Meow', email: 'sammy@meow.com')
     instructor = CourseInstructor.create(instructor_id: user.id, course_id: @course.id, primary: true)
-
     assert @course.primary_instructor == instructor    # instructor instance == instructor instance
   end
 
