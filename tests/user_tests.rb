@@ -52,5 +52,23 @@ class UserTest < MiniTest::Test
     assert grade.course_student == cs
   end
 
+  def test_students_are_ordered_by_last_name_first_name
+    student1 = User.create(first_name: 'Sterling', last_name: 'Archer', email: 'sarcher@isis.com')
+    student2 = User.create(first_name: 'Mallory', last_name: 'Archer', email: 'marcher@isis.com')
+    student3 = User.create(first_name: 'Algernop', last_name: 'Krieger', email: 'drkrieger@isis.com')
+    student4 = User.create(first_name: 'Cheryl', last_name: 'Tunt', email: 'neckbones@isis.com')
+
+    course = Course.create(name: 'course', course_code: 'cod123')
+
+    cs1 = CourseStudent.create(student_id: student1.id, course_id: course.id)
+    cs2 = CourseStudent.create(student_id: student2.id, course_id: course.id)
+    cs3 = CourseStudent.create(student_id: student3.id, course_id: course.id)
+    cs4 = CourseStudent.create(student_id: student4.id, course_id: course.id)
+
+    assert course.students[0] == student2
+    assert course.students[1] == student1
+    assert course.students[2] == student3
+    assert course.students[3] == student4
+  end
 
 end

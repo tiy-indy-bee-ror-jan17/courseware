@@ -31,4 +31,8 @@ class LessonTest < Minitest::Test
     assert_equal 1, ica.lessons.count
   end
 
+  def test_lessons_have_child_lessons
+    
+  end
+
 end
