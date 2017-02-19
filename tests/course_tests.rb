@@ -1,7 +1,7 @@
 class CourseTest < Minitest::Test
 
   def setup
-    @course = Course.create
+    @course = Course.create(course_code: 'course_code')
     @lesson = Lesson.create(course_id: @course.id, name: 'lesson')
   end
 
