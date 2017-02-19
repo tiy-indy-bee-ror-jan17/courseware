@@ -30,8 +30,8 @@ class ApplicationTest < Minitest::Test
     @course_two = Course.create(name: "Basic Warp Design", term: @term, course_code: "ncc74210")
     @course_student = CourseStudent.create(course: @course)
     @course_student_two = CourseStudent.create(course: @course)
-    @assignment = Assignment.create(course: @course)
-    @assignment_two = Assignment.create(course: @course)
+    @assignment = Assignment.create(course: @course, name: "Cochrane Theory for Dummies")
+    @assignment_two = Assignment.create(course: @course, name: "Transwarp Initiatives for cleaner space lanes")
     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment)
   end
@@ -40,7 +40,6 @@ class ApplicationTest < Minitest::Test
     assert true
   end
 
-# <<<<<<< HEAD
   def test_school_has_many_terms
     assert_equal 2, @school.terms.length
   end
@@ -157,7 +156,6 @@ class ApplicationTest < Minitest::Test
     course.errors.full_messages.include?("Course code is invalid")
   end
 
-# =======
   # B-Test-1
   def test_a_reading_is_destroyed_when_its_lesson_is_destroyed
     lesson_test = Lesson.create(course_id: 99, parent_lesson_id: 99, name: "Test Reading destroyed", pre_class_assignment_id: 1, in_class_assignment_id: 1)
@@ -251,21 +249,21 @@ class ApplicationTest < Minitest::Test
   #B-Test-8
   #The following tests come from a single deliverable
   def test_that_a_user_has_a_first_name
-    user_first_name = User.new()
+    user_first_name = User.create()
     assert user_first_name.first_name == nil
     assert user_first_name.errors.messages
     refute user_first_name.save
   end
 
   def test_that_a_user_has_a_last_name
-    user_last_name = User.new(first_name: "Bobby")
+    user_last_name = User.create(first_name: "Bobby")
     assert user_last_name.last_name == nil
     assert user_last_name.errors.messages
     refute user_last_name.save
   end
 
   def test_that_a_user_has_an_email
-    user_email = User.new(first_name: "Bobby", last_name: "Tables")
+    user_email = User.create(first_name: "Bobby", last_name: "Tables")
     assert user_email.email == ""
     assert user_email.errors.messages
     refute user_email.save
@@ -273,14 +271,65 @@ class ApplicationTest < Minitest::Test
 
   #B-Test-9
   def test_that_a_users_email_is_unique
-    unique_email = User.new(first_name: "Bobby", last_name: "Tables", email: "dropallthetables@dropitlikeitshot.com")
-    assert unique_email.save
-    unique_email1 = User.new(first_name: "Fred", last_name: "Dunston", email: "dropallthetables@dropitlikeitshot.com")
-    assert unique_email1.errors.messages
+    unique_email = User.create(first_name: "Bobby", last_name: "Tables", email: "dropallthetables@dropitlikeitshot.com", photo_url: "https://xkcd.com/327/")
+    assert unique_email.save!
+
+    unique_email1 = User.create(first_name: "Fred", last_name: "Dunston", email: "dropallthetables@dropitlikeitshot.com", photo_url: "https://xkcd.com/327/")
     refute unique_email1.save
+    assert unique_email1.errors.full_messages
   end
 
+  # #B-Test-10
+  def test_that_a_user_email_matches_a_pattern
+    email_pattern = User.new(first_name:"Jean Luc", last_name: "Picard", email: "capt_jean_luc_picardoftheussenterprise")
+    refute email_pattern.save
+
+    email_pattern2 = User.new(first_name: "Jean", last_name: "Picard", email: "CaptJeanLucPicard@Enterprise.com", photo_url:"https://terrygotham.files.wordpress.com/2014/01/dh4og59.jpg")
+    assert email_pattern2.save!
+  end
+
+  #The following tests come from a single deliverable
+  #B-Test-11
+  def test_that_a_users_photo_url_begins_with_http
+    pic_pattern_standard = User.new(first_name: "Nerys", last_name: "Kira", email: "keepresisting@resistance.com", photo_url: "vivaleresistance.png")
+
+    refute pic_pattern_standard.save
+    assert pic_pattern_standard.errors.messages
+
+    pic_pattern_http = User.new(first_name: "Jake", last_name:  "Sisko", email: "journalist@ds9.com", photo_url: "http://www.ds9.com/employees/pictures/saycheese.png")
+    assert pic_pattern_http.errors.full_messages
+    assert pic_pattern_http.save!
+
+  end
+
+  def test_that_a_users_photo_url_begins_with_https
+    pic_pattern_secure = User.new(first_name: "Benjamin", last_name: "Sisko", email: "baseballislife@ds9.com", photo_url: "wickedfastball.jpg")
+    refute pic_pattern_secure.save
+    assert pic_pattern_secure.errors.full_messages
+
+    pic_pattern_https = User.new(first_name: "Benjamin", last_name: "Sisko", email: "baseballislife@ds9.com", photo_url: "https://www.ds9.com/employees/pictures/wickedfastball.jpg")
+    assert pic_pattern_https.errors.full_messages
+    assert pic_pattern_https.save!
+  end
+
+  #The following tests come from one delivaerable
+  #B-Test-12
+  def test_that_assignments_have_a_name
+    assignment_noname = Assignment.new(name:"")
+    assert assignment_noname.name == ""
+    refute assignment_noname.save
+
+    assignment_name = Assignment.new(name: "Star Trekkin' across the Universe")
+    assert assignment_name.name == "Star Trekkin' across the Universe"
+    assert assignment_name.save
+
+  end
+
+  def test_that_assignments_have_a_course_id
+  end
+
+  def test_that_assignments_have_a_percent_of_grade
+  end
 
 #End of Class
-# >>>>>>> e3d3ce7f5d00b81f1ff70ff75e73e6c66a2ae7be
 end
