@@ -1,10 +1,7 @@
 class AssignmentTest < MiniTest::Test
 
   def setup
-    @rand_a_z = -> len=rand(26) { ('a'..'z').to_a.sample(len).join }
-    @rand_course_code = -> { @rand_a_z.call(3) + rand(100..999).to_s }
-
-    @course = Course.create(name: @rand_a_z.call, course_code: @rand_course_code.call)
+    @course = Course.create(name: rand_a_z, course_code: rand_course_code)
   end
 
   def test_assignments_have_course_id_and_name_and_percent_of_grade
@@ -18,7 +15,7 @@ class AssignmentTest < MiniTest::Test
   end
 
   def test_assignment_name_is_unique_within_given_course_id
-    course2 = Course.create(name: 'Sharp Pointy Things & Other Reasons to Become a Gelatinous Cube', course_code: @rand_course_code.call)
+    course2 = Course.create(name: 'Sharp Pointy Things & Other Reasons to Become a Gelatinous Cube', course_code: rand_course_code)
     assignment1 = Assignment.create(course_id: @course.id, name: 'Aztec Tomb', percent_of_grade: '76', due_at: '2017-01-18 21:06:59.001', active_at: '2017-01-18 21:06:59.001')
     assignment2 = Assignment.create(course_id: @course.id, name: 'Sword of Destiny', percent_of_grade: '81', due_at: '2017-01-18 21:06:59.001', active_at: '2017-01-18 21:06:59.001')
     assignment3 = Assignment.create(course_id: @course.id, name: 'Sword of Destiny', percent_of_grade: '66', due_at: '2017-01-18 21:06:59.001', active_at: '2017-01-18 21:06:59.001')

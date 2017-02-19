@@ -6,11 +6,12 @@ class Lesson < ActiveRecord::Base
   belongs_to :pre_class_assignment, class_name: 'Assignment',
                                     foreign_key: 'pre_class_assignment_id'
   belongs_to :in_class_assignment, class_name: "Assignment",
-                      foreign_key: 'in_class_assignment_id'
+                                   foreign_key: 'in_class_assignment_id'
   belongs_to :parent_lesson, class_name: 'Lesson'
 
   has_many :readings, dependent: :destroy
-  has_many :child_lessons, class_name: 'Lesson', foreign_key: 'parent_lesson_id'
+  has_many :child_lessons, class_name: 'Lesson',
+                           foreign_key: 'parent_lesson_id'
 
   delegate :code_and_name, to: :course, prefix: true
 
