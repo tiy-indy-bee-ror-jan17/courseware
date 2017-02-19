@@ -28,8 +28,9 @@ class ApplicationTest < Minitest::Test
     @user = User.find_or_create_by(first_name: "never", last_name: "nude", email: "email@email.com", photo_url: "http://nevernudephotos" )
     @student1 = User.find_or_create_by(first_name: "student", last_name: "one", email: "one@student.com", photo_url: "https://maybe")
     @student2 = User.find_or_create_by(first_name: "student", last_name: "two", email: "two@student.com" )
-    @instructor1 = User.find_or_create_by(first_name: "instructor", last_name: "one", email: "one@instructor.com" )
-    @instructor2 = User.find_or_create_by(first_name: "instructor", last_name: "two", email: "two@instructor.com" )
+    @instructor1 = User.find_or_create_by(first_name: "instructor", last_name: "one", email: "one@instructor.com")
+    @instructor2 = User.find_or_create_by(first_name: "instructor", last_name: "two", email: "two@instructor.com")
+    @instructor3 = User.find_or_create_by(first_name: "instructor3", last_name: "three", email: "three@instructor.com")
 
     @school = School.find_or_create_by(name: "school")
 
@@ -39,7 +40,7 @@ class ApplicationTest < Minitest::Test
     @course1 = Course.find_or_create_by(name: "course 1", term: @term1, course_code: "phi101")
     @course2 = Course.find_or_create_by(name: "course 2", term: @term1, course_code: "dav101")
 
-    @course_instructor1 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: @instructor1.id)
+    @course_instructor1 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: @instructor1.id, primary: true)
     @course_instructor2 = CourseInstructor.find_or_create_by(course: @course1, instructor_id: @instructor2.id)
 
     @course_student1 = CourseStudent.find_or_create_by(course: @course1, student: @student1)
@@ -238,10 +239,15 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_courses_have_many_students_through_course_students
-
+    refute_equal 0, @student1.courses.count
+    refute_equal 0, @course1.students.count
   end
 
   def test_associate_course_with_one_primary_instructor
 
+    course_instructor_a = CourseInstructor.create(course: @course1, instructor_id: @instructor3, primary: true)
+    assert @course_instructor2.valid?
+    assert course_instructor_a.errors.full_messages.include?("Primary instructor can only exist once per course")
+    refute course_instructor_a.valid?
   end
 end

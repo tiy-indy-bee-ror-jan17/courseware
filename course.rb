@@ -7,6 +7,7 @@ class Course < ActiveRecord::Base
   has_many :course_students
   has_many :assignments
   has_many :readings, through: :lessons
+  has_many :students, through: :course_students
 
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
 

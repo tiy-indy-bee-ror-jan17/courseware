@@ -4,7 +4,7 @@ class CourseStudent < ActiveRecord::Base
   scope :unapproved, -> { where(approved: false) }
 
   belongs_to :course
-  belongs_to :student, class_name: "User"#, foreign_key: "student_id"
+  belongs_to :student, class_name: "User"
   has_many :assignment_grades
 
   delegate :code_and_name, :color, to: :course, prefix: true
