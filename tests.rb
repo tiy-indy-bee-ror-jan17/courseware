@@ -35,7 +35,6 @@ class ApplicationTest < Minitest::Test
     @assignment_two = Assignment.create(course: @course, name: "Transwarp Initiatives for cleaner space lanes", course_id: @course.id, percent_of_grade: 0.52)
     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment)
-    @user = User.create
     @assignment_grade = AssignmentGrade.create(assignment: @assignment)
     @assignment_grade_two = AssignmentGrade.create(assignment: @assignment)
     @course_instructor = CourseInstructor.create(course: @course)
@@ -163,8 +162,10 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_course_instructor_belongs_to_instructor
-    course_instructor = CourseInstructor.create(instructor: @user)
-    assert course_instructor.instructor == @user
+    user = User.create(first_name: "Test", last_name: "Test", email: "borg2@borg.com", photo_url: "http://borg1.com")
+    course_instructor = CourseInstructor.create(instructor: user)
+    assert user.id
+    assert course_instructor.instructor == user
   end
 
   def test_assignment_has_many_assignment_grades
@@ -176,7 +177,10 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_course_has_many_instructors_through_course_instructors
-    assert_equal 2, @course.course_instructors.length
+    user = User.create(first_name: "Test", last_name: "Test", email: "borg3@borg.com", photo_url: "http://borg2.com")
+    course_instructor = CourseInstructor.create(instructor: user, course: @course)
+    course_instructor2 = CourseInstructor.create(instructor: user, course: @course)
+    assert_equal 2, @course.instructors.length
   end
 
   def test_assignment_due_date_is_after_assignment_active_date
