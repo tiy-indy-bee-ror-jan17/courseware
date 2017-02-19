@@ -408,17 +408,36 @@ class ApplicationTest < Minitest::Test
     assert assignment.assignment_grades.count > 0
   end
 
-  # Course to have many instructors through the Course's course_instructors.
-  # def test_course_linkedto_courseinstructors
-  #   course = Course.create(
-  #       course_code: 'abw123',
-  #       name: 'Python 871'
-  #       )
-  #   ci   = CourseInstructor.create(
-  #       instructor_id:  user.id)
-  #   assert ci.save
-  #   course.course_instructors << ci
-  #   assert course.course_instructors.count > 0
-  # end
+  #Course to have many instructors through the Course's course_instructors.
+  def test_course_linkedto_courseinstructors
+    course = Course.create(
+      course_code: 'abw123',
+      name: 'Python 871'
+      )
+    ci = CourseInstructor.create(
+        instructor_id:  :user_id)
+    assert ci.save
+    course.course_instructors << ci
+    assert course.course_instructors.count > 0
+  end
 
+  def test_assignment_dueat_notpriorto_aciveat
+    assignment = Assignment.create(
+      name: 'Rob',
+      course_id: 'act005',
+      percent_of_grade: 20,
+      active_at: '1501-01-02',
+      due_at:    '1500-01-01'
+      )
+      refute assignment.save
+      assignment2 = Assignment.create(
+        name: 'Rob67654',
+        course_id: 'aft005',
+        percent_of_grade: 20,
+        active_at: '1501-01-02',
+        due_at:    '1501-01-04'
+        )
+      assert assignment2.save
+  # end
+  end
 end

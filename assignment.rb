@@ -1,3 +1,4 @@
+
 class Assignment < ActiveRecord::Base
 
   belongs_to    :course
@@ -8,10 +9,19 @@ class Assignment < ActiveRecord::Base
   validates     :name, presence: true,
                         uniqueness: {scope: :course_id}
   validates     :percent_of_grade, presence: true
-
+  validate      :compare_dates
   scope :active_for_students, -> { where("active_at <= ? AND due_at >= ? AND students_can_submit = ?", Time.now, Time.now, true) }
 
   delegate :code_and_name, :color, to: :course, prefix: true
+
+  def compare_dates
+    due    = self.due_at
+    active = self.active_at
+    if due && active && (due < active)
+      # puts "\nDue_at #{due} prior to Active_at#{active}"
+      errors.add(:due_at, "Due_at prior to Active_at")
+    end
+  end
 
   def status(user = nil)
     AssignmentStatus.new(assignment: self, user: user)

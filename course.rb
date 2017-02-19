@@ -1,11 +1,9 @@
 class Course < ActiveRecord::Base
   belongs_to      :term
   belongs_to      :lessons
-  # belongs_to      :instructor through: :course_instructors
-  belongs_to      :instructor
   has_many        :course_students, dependent: :restrict_with_error
+  has_many        :instructors, through: :course_students
   has_many        :assignments, dependent: :destroy
-
   has_many        :readings, through: :lessons
   has_many        :lessons
 # Validate that the course_code starts with three letters
