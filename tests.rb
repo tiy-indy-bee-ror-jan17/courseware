@@ -30,8 +30,8 @@ class ApplicationTest < Minitest::Test
     @course_two = Course.create(name: "Basic Warp Design", term: @term, course_code: "ncc74210")
     @course_student = CourseStudent.create(course: @course)
     @course_student_two = CourseStudent.create(course: @course)
-    @assignment = Assignment.create(course: @course, name: "Cochrane Theory for Dummies")
-    @assignment_two = Assignment.create(course: @course, name: "Transwarp Initiatives for cleaner space lanes")
+    @assignment = Assignment.create(course: @course, name: "Cochrane Theory for Dummies", course_id: @course.id, percent_of_grade: 0.25 )
+    @assignment_two = Assignment.create(course: @course, name: "Transwarp Initiatives for cleaner space lanes", course_id: @course.id, percent_of_grade: 0.52)
     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment)
   end
@@ -85,7 +85,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_assignments_are_deleted_with_course
-    assingment = Assignment.create(name: "Intermix Chamber", course: @course_two)
+    assignment = Assignment.create(name: "Intermix Chamber", course: @course_two)
     @course_two.destroy
     refute Assignment.exists?(name: "Intermix Chamber")
   end
@@ -160,7 +160,7 @@ class ApplicationTest < Minitest::Test
   def test_a_reading_is_destroyed_when_its_lesson_is_destroyed
     lesson_test = Lesson.create(course_id: 99, parent_lesson_id: 99, name: "Test Reading destroyed", pre_class_assignment_id: 1, in_class_assignment_id: 1)
 
-    reading_test = Reading.create(lesson_id: lesson_test.id, caption: "Testy test", order_number: 99 )
+    reading_test = Reading.create(lesson_id: lesson_test.id, caption: "Testy test", order_number: 66)
 
     lesson_test.destroy
     refute Reading.find_by(caption: "Testy test")
@@ -319,16 +319,34 @@ class ApplicationTest < Minitest::Test
     assert assignment_noname.name == ""
     refute assignment_noname.save
 
-    assignment_name = Assignment.new(name: "Star Trekkin' across the Universe")
+    assignment_name = Assignment.new(name: "Star Trekkin' across the Universe", course_id: @course.id, percent_of_grade: 0.95)
     assert assignment_name.name == "Star Trekkin' across the Universe"
     assert assignment_name.save
-
   end
 
   def test_that_assignments_have_a_course_id
+    assignment_not_have_course_id = Assignment.new(name: "Only going forward because we can't find reverse!")
+    refute assignment_not_have_course_id.save
+
+    assignment_has_course_id = Assignment.new(name: "There's Klingons on the starboard bow, scrape them off Jim!", course_id: @course.id, percent_of_grade: 0.33)
+    assert assignment_has_course_id.save!
+
   end
 
   def test_that_assignments_have_a_percent_of_grade
+    assignment_no_pog = Assignment.new(name: "It's life Jim, but not as we know it.", course_id: @course.id)
+    refute assignment_no_pog.save
+
+    assignment_has_pog = @assignment
+    assert assignment_has_pog.save
+  end
+
+  def test_that_the_assignment_name_is_unique_within_a_given_course_id
+    assignment_unique = Assignment.new(name: "Avoiding Transporter Buffer Overruns", course_id: @course.id, percent_of_grade: 0.30 )
+    assert assignment_unique.save
+    assignment_not_unique = Assignment.new(name: "Avoiding Transporter Buffer Overruns", course_id: @course.id, percent_of_grade: 0.45)
+    refute assignment_not_unique.save
+    assert assignment_not_unique.errors.full_messages.include?("Name has already been taken")
   end
 
 #End of Class
