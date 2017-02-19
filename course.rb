@@ -6,6 +6,7 @@ class Course < ActiveRecord::Base
                           format: {with: /\A\D{3}.*\d{3}\z/} #begin with 3 letters and end with 3 digits
 
   belongs_to :term
+
   has_many :course_instructors, dependent: :restrict_with_error
   has_many :course_students, dependent: :restrict_with_error
   has_many :assignments, dependent: :destroy
