@@ -10,6 +10,8 @@ class Assignment < ActiveRecord::Base
   validates :course_id, presence: true
   validates :percent_of_grade, presence: true
 
+  default_scope { order("assignments.due_at, assignments.active_at") }
+
   scope :active_for_students, -> { where("active_at <= ? AND due_at >= ? AND students_can_submit = ?", Time.now, Time.now, true) }
 
   delegate :code_and_name, :color, to: :course, prefix: true

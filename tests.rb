@@ -189,6 +189,14 @@ class ApplicationTest < Minitest::Test
     assert assignment.errors.full_messages.include?("Due at date cannot be before active at date.")
   end
 
+  def test_assignments_are_ordered_by_due_at_then_active_at
+    course = Course.create(name: "Klingon Physiology", course_code: "ncc150")
+    assignment = Assignment.create(course: course, active_at: "1933-01-23", due_at: "1989-11-20")
+    assignment_two = Assignment.create(course: course, active_at: "1947-07-20", due_at: "1982-08-15")
+    assignment_three = Assignment.create(course: course, active_at: "1954-05-10", due_at: "1989-11-20")
+    assert_equal [assignment_two, assignment, assignment_three], course.assignments.to_a
+  end
+
 # End Person A Tests
 
   # B-Test-1
