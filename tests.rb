@@ -306,6 +306,8 @@ class ApplicationTest < Minitest::Test
   def test_childlessons_sorted_by_id
     refute_equal 0, @lesson1.lessons.count
     assert_equal @lesson1, @lesson2.parent_lesson
+    assert_equal 2, @lesson1.lessons.first.id
+    assert_equal 3, @lesson1.lessons.second.id
   end
 
 end
