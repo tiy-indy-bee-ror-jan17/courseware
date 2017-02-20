@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
   validates :photo_url, format: { with: /(https?)+:+(\/{2})/i }
 
   scope :want_to_be_instructors, -> { where(wants_to_be_instructor: true) }
-  scope :instructors_for_school_id, ->(school_id) { where(school_id: school_id, instructor: true) }
+  scope :instructors_for_school_id, -> (school_id) { where(school_id: school_id, instructor: true) }
 
   default_scope { order('last_name, first_name') }
 
