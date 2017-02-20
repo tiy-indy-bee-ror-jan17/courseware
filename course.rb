@@ -1,6 +1,9 @@
 class Course < ActiveRecord::Base
   belongs_to      :term
   belongs_to      :lessons
+  has_many        :instructors, through: :course_students
+  has_many        :assignments,
+    dependent: :destroy
   has_many        :course_students,
                     dependent: :restrict_with_error
   has_many        :instructors, through: :course_instructors

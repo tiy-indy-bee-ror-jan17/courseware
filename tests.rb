@@ -466,6 +466,41 @@ class ApplicationTest < Minitest::Test
     assert new_c_s.assignment_grades.count == 1
   end
 
+  def test_courses_assignments_orderedby_dueat_&active_at
+    course = Course.create(
+      course_code: 'axw123',
+      name: 'Python 411'
+    )
+    assert course.persisted?
+    a3 = Assignment.create(
+      name: 'c',
+      course_id: course.id,
+      percent_of_grade: 1,
+      due_at:    '1500-03-04',
+      active_at: '1500-03-03'
+      )
+    assert a3.persisted?
+    a2 = Assignment.create(
+      name: 'b',
+      course_id: course.id,
+      percent_of_grade: 1,
+      due_at:    '1500-03-04',
+      active_at: '1500-03-02'
+      )
+    assert a2.persisted?
+    a1 = Assignment.create(
+      name: 'a',
+      course_id: course.id,
+      percent_of_grade: 1,
+      due_at:    '1500-03-02',
+      active_at: '1500-03-01'
+      )
+    assert a1.persisted?
+    assert course.assignments.first  == a1
+    assert course.assignments.second == a2
+    assert course.assignments.third  == a3
+  end
+
   def test_course_has_many_students_through_course_students
     new_user = User.create(
             first_name: 'Chris',
