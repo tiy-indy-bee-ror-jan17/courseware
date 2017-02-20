@@ -220,6 +220,16 @@ class ApplicationTest < Minitest::Test
     c_id2.destroy
   end
 
-  
+  def test_that_terms_with_courses_are_not_deletable
+    assert @term1.valid?
+    @term1.destroy
+    refute @term1.destroy
+  end
+
+  def test_that_courses_with_students_are_not_deletable
+    assert @course1.valid?
+    @course1.destroy
+    refute @course1.destroy
+  end
 
 end
