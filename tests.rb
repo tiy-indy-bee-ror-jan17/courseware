@@ -201,7 +201,6 @@ class ApplicationTest < Minitest::Test
     course_student2 = CourseStudent.create(student_id: user2.id,course_id: course.id)
     user3 = User.create(first_name: "Test",last_name: "User",email: "user3@test.com")
     course_student3 = CourseStudent.create(student_id: user3.id,course_id: course.id)
-
     assert affirm(course_student1.course, "Course")
     assert affirm(course_student2.course, "Course")
     assert affirm(course_student3.course, "Course")
@@ -215,18 +214,24 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_sorting_last_and_first_names_by_student
-    student1 = User.create(first_name:  "Michael",  last_name: "Stashevsky",email: "mike@stashevsky.com")
-    student2 = User.create(first_name:  "Stephen",  last_name: "Stashevsky",email: "stephen@stashevsky.com")
-    student3 = User.create(first_name:  "David",    last_name: "Stashevsky",email: "dave@stashevsky.com")
-    student4 = User.create(first_name:  "Jennifer", last_name: "Stashevsky",email: "jen@stashevsky.com")
-    student5 = User.create(first_name:  "Andrew",   last_name: "Evan",      email: "andrew@evan.com")
-    student6 = User.create(first_name:  "Bonnie",   last_name: "Evan",      email: "bonnie@evan.com")
-    student7 = User.create(first_name:  "Paul",     last_name: "Evan",      email: "paul@evan.com")
-    student8 = User.create(first_name:  "Ben",      last_name: "Evan",      email: "ben@evan.com")
-    student9 = User.create(first_name:  "Aimee",    last_name: "Evan",      email: "aimee@evan.com")
-    student10 = User.create(first_name: "Sam",      last_name: "Evan",      email: "sam@evan.com")
-    course  = Course.create(name: "Epic Mode",course_code: "qwe098")
-    students_to_name = [student1,student2,student3,student4,student5,student6,student7,student8,student9,student10]
+    student_objects = [
+      ["Michael", "Stashevsky","mike@stashevsky.com"],
+      ["Stephen", "Stashevsky","stephen@stashevsky.com"],
+      ["David",   "Stashevsky","dave@stashevsky.com"],
+      ["Jennifer","Stashevsky","jen@stashevsky.com"],
+      ["Andrew",  "Evan",      "andrew@evan.com"],
+      ["Bonnie",  "Evan",      "bonnie@evan.com"],
+      ["Paul",    "Evan",      "paul@evan.com"],
+      ["Ben",     "Evan",      "ben@evan.com"],
+      ["Aimee",   "Evan",      "aimee@evan.com"],
+      ["Sam",     "Evan",      "sam@evan.com"]
+    ]
+    students_to_name = Array.new
+    student_objects.each do |student_name|
+      student_name_array = User.create!(title: "", first_name: student_name[0], middle_name: "", last_name: student_name[1], email:student_name[2])
+      students_to_name << student_name_array
+    end
+    epic_course  = Course.create(name: "Epic Mode",course_code: "qwe098")
     course_students_names = Array.new
     students_to_name.each do |student_to_name|
       course_students_names << student_to_name
@@ -234,17 +239,12 @@ class ApplicationTest < Minitest::Test
     student_names = Array.new
     course_students_names.each do |course_student_name|
       student_name = Hash.new(last_name: "", first_name: "")
-      CourseStudent.create(course_id: course.id, student_id: course_student_name.id)
-      assert course_student_name.enrolled?(course)
+      CourseStudent.create(course_id: epic_course.id, student_id: course_student_name.id)
+      assert course_student_name.enrolled?(epic_course)
       student_name[:last_name] = course_student_name.last_name
       student_name[:first_name] = course_student_name.first_name
       student_names << student_name
     end
-    student_names.each do |student_name_puts|
-      puts "#{student_name_puts[:last_name]}, #{student_name_puts[:first_name]}"
-    end
-
-
-
+    assert epic_course.students.first.full_name == " Aimee Evan"
   end
 end

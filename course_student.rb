@@ -1,11 +1,8 @@
 class CourseStudent < ActiveRecord::Base
 
-  belongs_to :student, class_name: "User",
-                       foreign_key: "id"
-  belongs_to :course, class_name: "Course",
-                      foreign_key: "course_id"
-  has_many :assignment_grades, foreign_key: "id"
+  belongs_to :student, class_name: "User"
   belongs_to :course
+  has_many :assignment_grades
 
 
   scope :approved, -> { where(approved: true) }
