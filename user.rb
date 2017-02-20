@@ -1,9 +1,12 @@
 class User < ActiveRecord::Base
 
-  # has_many :course_students, class_name: "CourseStudent", foreign_key: "student_id"
   # assocations
   has_many :course_students, foreign_key: "student_id"
   has_many :courses, through: :course_students
+  has_many :courses, through: :course_instructors
+  has_many :course_instructors,
+           class_name: "CourseInstructor",
+           foreign_key: "instructor_id"
   # validation
   validates :first_name, presence: true
   validates :last_name, presence: true
@@ -41,8 +44,8 @@ class User < ActiveRecord::Base
     aa && aa.awarded
   end
 
-  def enrolled?(course)
-    courses.find_by(id: course.id)
+  def enrolled?(course_id)
+    courses.find_by(id: course_id)
   end
 
   def teaching?(course)
