@@ -18,11 +18,10 @@ ActiveRecord::Base.establish_connection(
 begin ApplicationMigration.migrate(:down); rescue; end
 ApplicationMigration.migrate(:up)
 
-
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
-# Person A Tests
+  #Person A Tests
   def setup
     @school = School.create(name: "Starfleet Academy")
     @term = Term.create(name: "Fall Term", starts_on: "2004-05-26", ends_on: Date.today, school_id: 1, school: @school)
@@ -106,7 +105,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_assignment_has_many_lessons
-    assert_equal 2, @assignment.lessons.length
+    assert_equal 2, @assignment.pre_class_lessons.length
   end
 
   def test_school_has_many_courses_through_terms
@@ -213,7 +212,7 @@ class ApplicationTest < Minitest::Test
   def test_a_reading_is_destroyed_when_its_lesson_is_destroyed
     lesson_test = Lesson.create(course_id: 99, parent_lesson_id: 99, name: "Test Reading destroyed", pre_class_assignment_id: 1, in_class_assignment_id: 1)
 
-    reading_test = Reading.create(lesson_id: lesson_test.id, caption: "Testy test", order_number: 66)
+    Reading.create(lesson_id: lesson_test.id, caption: "Testy test", order_number: 66)
 
     lesson_test.destroy
     refute Reading.find_by(caption: "Testy test")
@@ -223,9 +222,9 @@ class ApplicationTest < Minitest::Test
   def test_destroying_a_course_destroys_its_associated_lessons
     course_test = Course.create(name: "Destroying lessons like a BAWSS", course_code: "ncc74656")
 
-    lesson_test = Lesson.create(course_id: course_test.id, parent_lesson_id: 99, name: "Destroy this lesson!")
+    Lesson.create(course_id: course_test.id, parent_lesson_id: 99, name: "Destroy this lesson!")
 
-    lesson_test2 = Lesson.create(course_id: course_test.id, parent_lesson_id: 99, name: "Destroy this lesson too!")
+    Lesson.create(course_id: course_test.id, parent_lesson_id: 99, name: "Destroy this lesson too!")
 
     course_test.destroy
     refute Lesson.find_by(name: "Destroy this lesson!")
@@ -235,27 +234,36 @@ class ApplicationTest < Minitest::Test
   #B-Test-3
   def test_that_a_course_with_instructors_cannot_be_deleted
     course_test = Course.create(name: "Destroying lessons like a BAWSS", course_code: "ncc1764")
-    instructor_test = CourseInstructor.create(course_id: course_test.id)
+    CourseInstructor.create(course_id: course_test.id)
 
     refute course_test.destroy
   end
 
   #B-Test-4
   def test_that_a_lesson_is_associated_with_its_in_class_assignment
-    assign_test = Assignment.create(name: "Assignment Test")
-    lesson_test = Lesson.create(in_class_assignment_id: assign_test.id)
+    assign_test = Assignment.create(name: "Assignment Test", course_id: @course.id, percent_of_grade: 0.34, active_at: Date.today, due_at: "2017-05-15")
+    assert assign_test.persisted?
+    assert assign_test.save!
 
-    assert lesson_test.in_class_assignment_id == assign_test.id
+    lesson_test = Lesson.create(name: "Test In Class Lesson is associated",in_class_assignment: assign_test)
+    assert lesson_test.persisted?
+    assert lesson_test.save!
+    assert lesson_test.in_class_assignment == assign_test
   end
 
   #B-Test-5
   def test_a_course_has_many_readings_through_lessons
     course_many_readings_test = Course.create(name: "Advanced Lesson Destroying", course_code: "ncc2000")
+
     lesson_test = Lesson.create(course_id: course_many_readings_test.id, name: "Lesson Destroying Best Practices")
+
     lesson_test2 = Lesson.create(course_id: course_many_readings_test.id, name: "Lesson Destroying: Safety")
-    reading_test1 = Reading.create(lesson_id: lesson_test.id, caption: "Lesson Destroying: Industry Methods and Standards", url: "http://destroythelesson.com", order_number: 1)
-    reading_test2 = Reading.create(lesson_id: lesson_test.id, caption: "How to destroy Lessons Safely", url: "http://destroythelesson.com", order_number: 1)
-    reading_test3 = Reading.create(lesson_id: lesson_test2.id, caption: "What to do after you've destroyed a lesson",url: "http://destroythelesson.com", order_number: 1)
+
+    Reading.create(lesson_id: lesson_test.id, caption: "Lesson Destroying: Industry Methods and Standards", url: "http://destroythelesson.com", order_number: 1)
+
+    Reading.create(lesson_id: lesson_test.id, caption: "How to destroy Lessons Safely", url: "http://destroythelesson.com", order_number: 1)
+
+    Reading.create(lesson_id: lesson_test2.id, caption: "What to do after you've destroyed a lesson",url: "http://destroythelesson.com", order_number: 1)
 
     assert course_many_readings_test.readings.count > 2
   end
@@ -334,10 +342,10 @@ class ApplicationTest < Minitest::Test
 
   # #B-Test-10
   def test_that_a_user_email_matches_a_pattern
-    email_pattern = User.new(first_name:"Jean Luc", last_name: "Picard", email: "capt_jean_luc_picardoftheussenterprise")
+    email_pattern = User.new(first_name:"Jean Luc", middle_name: "Luc", last_name: "Picard", email: "capt_jean_luc_picardoftheussenterprise")
     refute email_pattern.save
 
-    email_pattern2 = User.new(first_name: "Jean", last_name: "Picard", email: "CaptJeanLucPicard@Enterprise.com", photo_url:"https://terrygotham.files.wordpress.com/2014/01/dh4og59.jpg")
+    email_pattern2 = User.new(first_name: "Jean", middle_name: "Luc", last_name: "Picard", email: "CaptJeanLucPicard@Enterprise.com", photo_url:"https://terrygotham.files.wordpress.com/2014/01/dh4og59.jpg")
     assert email_pattern2.save!
   end
 
@@ -352,7 +360,6 @@ class ApplicationTest < Minitest::Test
     pic_pattern_http = User.new(first_name: "Jake", last_name:  "Sisko", email: "journalist@ds9.com", photo_url: "http://www.ds9.com/employees/pictures/saycheese.png")
     assert pic_pattern_http.errors.full_messages
     assert pic_pattern_http.save!
-
   end
 
   def test_that_a_users_photo_url_begins_with_https
@@ -383,7 +390,6 @@ class ApplicationTest < Minitest::Test
 
     assignment_has_course_id = Assignment.new(name: "There's Klingons on the starboard bow, scrape them off Jim!", course_id: @course.id, percent_of_grade: 0.33)
     assert assignment_has_course_id.save!
-
   end
 
   def test_that_assignments_have_a_percent_of_grade
@@ -397,9 +403,68 @@ class ApplicationTest < Minitest::Test
   def test_that_the_assignment_name_is_unique_within_a_given_course_id
     assignment_unique = Assignment.new(name: "Avoiding Transporter Buffer Overruns", course_id: @course.id, percent_of_grade: 0.30 )
     assert assignment_unique.save
+
     assignment_not_unique = Assignment.new(name: "Avoiding Transporter Buffer Overruns", course_id: @course.id, percent_of_grade: 0.45)
     refute assignment_not_unique.save
     assert assignment_not_unique.errors.full_messages.include?("Name has already been taken")
+  end
+
+  #B Adventurer Mode
+  def test_that_course_students_are_associated_with_students
+    new_user = User.create(first_name: "Alexander", last_name: "Rozhenko", email: "mydadisawarrior@ds9.com", photo_url: "https://vignette2.wikia.nocookie.net/startrek/images/8/8c/Alexander2374.jpg/revision/latest?cb=20060627132913")
+    assert new_user.save!
+
+    course_student = CourseStudent.create(student: new_user, student_id: new_user.id, course_id: @course.id)
+    assert course_student.student_id == new_user.id
+  end
+
+  def test_that_course_students_are_associated_with_assignment_grades
+    student_grade = User.new(last_name: "Sito", first_name: "Jaxa", email: "blindfoldedbutstillwinning@enterprise.com", photo_url: "https://vignette2.wikia.nocookie.net/memoryalpha/images/d/df/Sito_jaxa.jpg/revision/latest?cb=20141207024353&path-prefix=en")
+    assert student_grade.save!
+
+    course_student = CourseStudent.create(student: student_grade, student_id: student_grade.id, course_id: @course.id)
+    assert course_student.save!
+
+    assignment_user = AssignmentGrade.create(assignment_id: @assignment.id, course_student_id: course_student.student_id)
+    assert assignment_user.save!
+
+    assert student_grade.id == course_student.student_id
+
+    assert course_student.student_id == assignment_user.course_student_id
+
+    assert assignment_user.course_student_id == student_grade.id
+  end
+
+  def test_that_a_course_has_many_students_through_courses_course_students
+    student = User.create(last_name: "Ro", first_name: "Laren", email: "solongandthanksforallthefeds@maquis.com", photo_url: "https://www.maquis.com/raiders/ro_laren.jpg")
+    assert student.persisted?
+    assert student.save!
+
+    student1 = User.create(last_name: "Zek", first_name: "Grand Nagus", email: "ruleofacquisition32@latinum.com", photo_url: "https://www.latinum.com/aintizekksy.png")
+    assert student1.persisted?
+    assert student.save!
+
+    CourseStudent.create(student: student, course: @course)
+
+    CourseStudent.create(student: student1, course: @course)
+
+    assert_equal 2, @course.students.length
+  end
+
+  def test_that_a_course_is_tied_to_its_primary_instructor
+  # The primary instructor is the one who is referenced by a course_instructor which has its primary flag set to true.
+    course_primary_inst = Course.create(name: "I'm the only instructor", course_code: "ncc5678")
+    assert course_primary_inst.persisted?
+    assert course_primary_inst.save!
+
+    primary_inst_user = User.new(last_name: "Noonien Singh", first_name: "Khan", email: "gonnablowuptheenterprise@outcast.net", photo_url: "https://heresmypicsuckas.png")
+
+    primary_inst = CourseInstructor.create(course: course_primary_inst, instructor: primary_inst_user, primary: true)
+    assert primary_inst.persisted?
+    assert primary_inst.save!
+
+    p course_primary_inst.primary_instructor
+    assert course_primary_inst.primary_instructor == primary_inst_user
   end
 
 end

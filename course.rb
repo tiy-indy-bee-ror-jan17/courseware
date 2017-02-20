@@ -2,7 +2,10 @@ class Course < ActiveRecord::Base
 
   belongs_to :term
   has_many :course_students, dependent: :restrict_with_error
+  has_many :students, through: :course_students
   has_many :assignments, dependent: :destroy
+  has_one :primary_instructor, through: :true_primary_instructor, source: :instructor
+  has_one :true_primary_instructor, -> { where(primary: true)}, class_name: "CourseInstructor"
   has_many :instructors, through: :course_instructors
   has_many :course_instructors, dependent: :restrict_with_error
   has_many :lessons, dependent: :destroy

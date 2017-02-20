@@ -1,6 +1,7 @@
 class AssignmentGrade < ActiveRecord::Base
 
   belongs_to :assignment
+  belongs_to :student_id, class_name: "CourseStudent", foreign_key: :course_student_id
 
   scope :graded, -> { joins(:assignment).where("assignments.grades_released IS TRUE") }
 

@@ -2,7 +2,9 @@ class Assignment < ActiveRecord::Base
 
   belongs_to :course
   belongs_to :lesson
-  has_many :lessons, foreign_key: "pre_class_assignment_id"
+  has_many :pre_class_lessons, class_name: "Lesson", foreign_key: "pre_class_assignment_id"
+
+  has_many :in_class_lessons, class_name: "Lesson", foreign_key: "in_class_assignment_id"
   has_many :assignment_grades
 
   validate :cannot_be_due_before_active
