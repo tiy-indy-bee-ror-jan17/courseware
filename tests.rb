@@ -53,7 +53,8 @@ class ApplicationTest < Minitest::Test
     @assignment3 = Assignment.find_or_create_by(name: "assignment 3", course: @course2, percent_of_grade: 0.25)
 
     @lesson1 = Lesson.find_or_create_by(name: "lesson 1", course: @course1, in_class_assignment: @assignment1)
-    @lesson2 = Lesson.find_or_create_by(name: "lesson 2", course: @course1)
+    @lesson2 = Lesson.find_or_create_by(name: "lesson 2", course: @course1, parent_lesson: @lesson1)
+    @lesson3 = Lesson.find_or_create_by(name: "lesson 3", course: @course1, parent_lesson: @lesson1)
 
     @reading1 = Reading.find_or_create_by(caption: "reading 1", lesson: @lesson1, order_number: 1, url: "http://google.com")
     @reading2 = Reading.find_or_create_by(caption: "reading 2", lesson: @lesson1, order_number: 2, url: "http://google.com")
@@ -300,6 +301,11 @@ class ApplicationTest < Minitest::Test
     assert_equal "astudent", @course1.students.first.first_name
     assert_equal "zeb", @course1.students.second.first_name
     assert_equal "bstudent", @course1.students.third.first_name
+  end
+
+  def test_childlessons_sorted_by_id
+    refute_equal 0, @lesson1.lessons.count
+    assert_equal @lesson1, @lesson2.parent_lesson
   end
 
 end
