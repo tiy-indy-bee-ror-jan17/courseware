@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
 
   has_many :course_instructors, foreign_key: "instructor_id"
 
-  has_many :course_students, foreign_key: "students_id"
+
 
 
   def full_name
