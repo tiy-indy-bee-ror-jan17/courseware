@@ -10,6 +10,8 @@ class Lesson < ActiveRecord::Base
               class_name: "Assignment",
               foreign_key: "pre_class_assignment_id"
 
+  validates :name, presence: true
+
   delegate :code_and_name, to: :course, prefix: true
 
   scope :roots, -> { where("parent_lesson_id IS NULL") }

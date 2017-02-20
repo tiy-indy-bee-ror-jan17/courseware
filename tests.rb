@@ -35,8 +35,6 @@ class ApplicationTest < Minitest::Test
     assert school.respond_to?(:terms)
   end
 
-
-
   def test_term_can_be_added_to_school
     school = School.create(name: "NSES")
     Term.create(name: "Fall",
@@ -51,7 +49,9 @@ class ApplicationTest < Minitest::Test
                         starts_on: "01-01-0001",
                         ends_on: "01-02-0001",
                         school_id: 1)
-    course = Course.create(name: "Math", term_id: term.id)
+    course = Course.create(name: "Math",
+                           term_id: term.id,
+                           course_code: "AAA1311")
     assert course.term_id == term.id
     refute term.destroy
     assert term.errors.full_messages.include? "Cannot delete record because dependent courses exist"
@@ -63,7 +63,9 @@ class ApplicationTest < Minitest::Test
                        ends_on: "01-02-0001",
                        school_id: 1)
     assert term.save
-    course = Course.create(name: "Math", term_id: term.id)
+    course = Course.create(name: "Math",
+                          term_id: term.id,
+                          course_code: "AAA1211")
     assert course.save
     assert course.term.name == "Fall"
   end
@@ -72,42 +74,142 @@ class ApplicationTest < Minitest::Test
     user = User.create(first_name: "Test",
                       last_name: "User",
                       email: "user2@te2sting.com")
-    course = Course.create(name: "Math")
-    # p user
-    # puts "\n"
-    # p course
-    # puts "\n"
+    course = Course.create(name: "Math",
+                           course_code: "AAA1011")
     course_student = CourseStudent.create(course_id: course.id, student_id: user.id)
-    # p course_student
     assert course_student.course_id == course.id
     refute course.destroy
     assert course.errors.full_messages.include? "Cannot delete record because dependent course students exist"
   end
 
   def test_assignments_with_courses_association
-    course = Course.create(name: "Math")
+    course = Course.create(name: "Math",
+                           course_code: "AAA1rew511")
     assignment = Assignment.create(course_id: course.id,
                                   name: "Test99",
                                   percent_of_grade: 0)
-    # p assignment
-    # assert assignment.save
     assignment2 = Assignment.create(course_id: course.id,
                                     name: "Test98",
                                     percent_of_grade: 0)
-    # p assignment2
-    # assert assignment2.save
     assert course.assignments.count == 2
     assert course.destroy
     assert course.assignments.count == 0
   end
 
   def test_school_has_many_courses_through_schools_term
+    school = School.create(name: "NSES")
+    term = Term.create(name: "Fall",
+                       starts_on: "01-01-0001",
+                       ends_on: "01-02-0001",
+                       school_id: school.id)
+    course_1 = Course.create(name: "Math",
+                             course_code: "AAA1151",
+                             term_id: term.id)
+    course_2 = Course.create(name: "English",
+                             course_code: "BBB1181",
+                             term_id: term.id)
+    assert school.courses.count == 2
+  end
 
+  def test_lessons_have_names
+    lesson = Lesson.create(name: "Math Lesson")
+    assert lesson.valid?
+  end
+
+  def test_readings_have_order_number_lesson_id_url
+    reading = Reading.create(order_number: 1,
+                             lesson_id: 1,
+                             url: "http://espn.com")
+    assert reading.save
+  end
+
+  def test_url_verification
+    reading = Reading.create(order_number: 1,
+                             lesson_id: 1,
+                             url: "htp://espn.com")
+    refute reading.save
+  end
+
+  def test_courses_have_course_code_and_name
+    course = Course.create(name: "Math",
+                           course_code: "AAA10000011")
+    assert course.save
+  end
+
+  def test_course_code_uniq_within_term_id
+    school = School.create(name: "NSES")
+    term1 = Term.create(name: "Fall",
+                       starts_on: "01-01-0001",
+                       ends_on: "01-02-0001",
+                       school_id: 1)
+    course1 = Course.create(name: "Math",
+                           course_code: "AAA111000")
+    assert course1.save
+    course2 = Course.create(name: "English",
+                           course_code: "AAA111000")
+    refute course2.save
+  end
+
+  def test_course_code_regex
+    course = Course.create(name: "Math",
+                           course_code: "AAA15511")
+    assert course.save
+  end
+
+  def test_course_instructos_are_users
+    magic_mike = User.create(first_name: "Mike",
+                       last_name: "Staaaaaaaahchefski",
+                       email: "moneymike@craigslist.org",
+                       instructor: true)
+    course_instructors = CourseInstructor.create(instructor_id: magic_mike.id)
+    assert magic_mike.id == course_instructors.instructor_id
+  end
+
+  def test_assigntments_have_assignment_grades
+    assignment = Assignment.create(name: "HW5",
+                                   course_id: 1,
+                                   percent_of_grade: 5)
+    assignment_grades = AssignmentGrade.create(assignment_id: assignment.id)
+    assignment_grades2 = AssignmentGrade.create(assignment_id: assignment.id)
+    assert assignment.assignment_grades.count == 2
+  end
+
+  def test_assignment_grades_belong_to_an_assignment
+    assignment = Assignment.create(name: "HW5",
+                                   course_id: 1,
+                                   percent_of_grade: 5)
+    assignment_grades = AssignmentGrade.create(assignment_id: assignment.id)
+    assert assignment_grades.assignment_id == assignment.id
+  end
+
+  def test_course_has_many_instructors_through_course_instructors
+    course = Course.create(name: "Math",
+                           course_code: "AAA153232511")
+    magic_ike = User.create(first_name: "Ike",
+                             last_name: "Staaaaaaaahchefski",
+                             email: "moneyike@yahooligan.org",
+                             instructor: true)
+    course.instructors << magic_ike
+    assert course.instructors.count == 1
+    assert course.instructors.first == magic_ike
+    assert course.course_instructors.length == 1
+    assert magic_ike.courses.length == 1
+  end
+
+  def test_assignment_cant_be_due_before_active
+    assignment = Assignment.create(name: "HW5",
+                                   course_id: 1,
+                                   percent_of_grade: 5,
+                                   due_at: 12/12/2012,
+                                   active_at: 12/13/2012)
+    refute assignment.save
   end
 
   def test_lessons_readings_association
-    lesson = Lesson.create()
-    reading = Reading.create(lesson_id: lesson.id)
+    lesson = Lesson.create(name: "Math Lesson")
+    reading = Reading.create(order_number: 1,
+                             lesson_id: lesson.id,
+                             url: "http://test.com")
     # p reading
     # p lesson
     assert_equal lesson.id, reading.lesson_id
@@ -115,12 +217,11 @@ class ApplicationTest < Minitest::Test
     # Set up a School to have many courses through the school's terms.
 
 
-  def test_lessons_have_names
 
-  end
 
   def test_lessons_courses_association
-    course = Course.create()
+    course = Course.create(name: "Math",
+                           course_code: "AAA111344")
     lesson = Lesson.create(course_id: course.id)
     # test1 = course
     # test2 = lesson
@@ -134,7 +235,8 @@ class ApplicationTest < Minitest::Test
                        last_name: "User",
                        email: "test@used.com",
                        instructor: true)
-    course = Course.create()
+    course = Course.create(name: "Math",
+                           course_code: "AAA1544311")
     course_instructor = CourseInstructor.create(course_id: course.id, instructor_id: user.id)
     # p course
     # p course_instructor
@@ -144,12 +246,9 @@ class ApplicationTest < Minitest::Test
   end
     # Validate that Lessons have names.
 
-  def test_readings_have_order_number_lesson_id_url
-
-  end
-
   def test_lessons_in_class_assignments_association
-    course = Course.create()
+    course = Course.create(name: "Math",
+                           course_code: "AAA0890111")
     assignment = Assignment.create(
                           name: "Test1",
                           course_id: course.id,
@@ -171,15 +270,15 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_lessons_pre_class_assignments_association
-    course = Course.create()
+    course = Course.create(name: "Math",
+                           course_code: "AAA15349811"
+                          )
     assignments = Assignment.create(
                           name: "Test2",
                           course_id: course.id,
                           percent_of_grade: 100.00
                           )
-    lesson_assignments = Lesson.create(
-                            pre_class_assignment_id: assignments.id
-                          )
+    lesson_assignments = Lesson.create(pre_class_assignment_id: assignments.id)
     # puts "Pre Class Assignment\n"
     # puts "\n"
     # p lesson_assignments
@@ -204,11 +303,6 @@ class ApplicationTest < Minitest::Test
   end
     # Validate that Readings must have an order_number, a lesson_id,
     #  and a url.
-    #
-
-  def test_url_verification
-
-  end
 
   def test_school_has_name
     school = School.create(name: "")
@@ -241,10 +335,6 @@ class ApplicationTest < Minitest::Test
   end
     # Validate that the Readings url must start with http:// or
     # https://. Use a regular expression.
-    #
-
-  def test_courses_have_course_code_and_name
-  end
 
   def test_user_has_name_and_email
     user = User.create(first_name: "", last_name: "", email: "")
@@ -278,9 +368,7 @@ class ApplicationTest < Minitest::Test
   end
     # Validate that Courses have a course_code and a name.
 
-  def test_course_code_uniq_within_term_id
 
-  end
 
   def test_user_email_proper_format
     user = User.create(first_name: "Test",
@@ -321,7 +409,8 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_assignment_name_unique_within_course
-    course = Course.create()
+    course = Course.create(name: "Math",
+                           course_code: "AAA109099011")
     assignment = Assignment.create(course_id: course.id,
                                 name: "Test",
                                 percent_of_grade: 0)
@@ -517,7 +606,8 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_course_has_many_students_through_course_student
-    course = Course.create()
+    course = Course.create(name: "Math",
+                           course_code: "AAA111")
     user1 = User.create(first_name: "Test",
                       last_name: "User",
                       email: "user1@test.com")
