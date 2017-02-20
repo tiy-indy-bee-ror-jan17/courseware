@@ -17,16 +17,17 @@ class MyPetOceanTest < Minitest::Test
     @assignment_grade = AssignmentGrade.find_or_create_by!(assignment_id: @assignment.id)
   end
 
-  def test_uniqueness
-    assert Course.create(name: 'Catbutt & Other Great Things to Call Your Dumbass Friends',
-                         course_code: '532',
-                         term_id: @term.id)
-                 .invalid?
-  end
-
   def test_assignment_ordering
     correct_order = Assignment.all.sort_by{ |a| [-a.due_at.to_i, -a.active_at.to_i] }
     assert Assignment.all == correct_order
+  end
+
+  def test_uniqueness
+    assert Course.create(
+                         name: 'Catbutt & Other Great Things to Call Your Dumbass Friends',
+                         course_code: '532',
+                         term_id: @term.id
+                        ).invalid?
   end
 
   def test_associations
