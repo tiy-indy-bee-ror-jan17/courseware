@@ -21,7 +21,7 @@ ApplicationMigration.migrate(:up)
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
-# Person A Tests
+  #Person A Tests
   def setup
     @school = School.create(name: "Starfleet Academy")
     @term = Term.create(name: "Fall Term", starts_on: "2004-05-26", ends_on: Date.today, school_id: 1, school: @school)
@@ -99,7 +99,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_assignment_has_many_lessons
-    assert_equal 2, @assignment.lessons.length
+    assert_equal 2, @assignment.pre_class_lessons.length
   end
 
   def test_school_has_many_courses_through_terms
@@ -177,8 +177,8 @@ class ApplicationTest < Minitest::Test
 
   def test_course_has_many_instructors_through_course_instructors
     user = User.create(first_name: "Test", last_name: "Test", email: "borg3@borg.com", photo_url: "http://borg2.com")
-    course_instructor = CourseInstructor.create(instructor: user, course: @course)
-    course_instructor2 = CourseInstructor.create(instructor: user, course: @course)
+    CourseInstructor.create(instructor: user, course: @course)
+    CourseInstructor.create(instructor: user, course: @course)
     assert_equal 2, @course.instructors.length
   end
 
@@ -223,10 +223,14 @@ class ApplicationTest < Minitest::Test
 
   #B-Test-4
   def test_that_a_lesson_is_associated_with_its_in_class_assignment
-    assign_test = Assignment.create(name: "Assignment Test")
-    lesson_test = Lesson.create(in_class_assignment_id: assign_test.id)
+    assign_test = Assignment.create(name: "Assignment Test", course_id: @course.id, percent_of_grade: 0.34, active_at: Date.today, due_at: "2017-05-15")
+    assert assign_test.persisted?
+    assert assign_test.save!
 
-    assert lesson_test.in_class_assignment_id == assign_test.id
+    lesson_test = Lesson.create(name: "Test In Class Lesson is associated",in_class_assignment: assign_test)
+    assert lesson_test.persisted?
+    assert lesson_test.save!
+    assert lesson_test.in_class_assignment == assign_test
   end
 
   #B-Test-5
@@ -394,18 +398,55 @@ class ApplicationTest < Minitest::Test
 
     course_student = CourseStudent.create(student: new_user, student_id: new_user.id, course_id: @course.id)
     assert course_student.student_id == new_user.id
-    # assert course_student.student_id == @user.id
   end
 
-  # def test_that_coursestudents_are_associated_with_assignment_grades
-  # end
-  #
-  # def test_that_a_course_has_many_students_through_the_courses_course_students
-  # end
+  def test_that_course_students_are_associated_with_assignment_grades
+    student_grade = User.new(last_name: "Sito", first_name: "Jaxa", email: "blindfoldedbutstillwinning@enterprise.com", photo_url: "https://vignette2.wikia.nocookie.net/memoryalpha/images/d/df/Sito_jaxa.jpg/revision/latest?cb=20141207024353&path-prefix=en")
+    assert student_grade.save!
 
-  # # This primary instructor is the one who is referenced by a course_instructor which has its primary flag set to true.
-  # def test_that_a_course_is_tied_to_its_primary_instructor
-  # end
+    course_student = CourseStudent.create(student: student_grade, student_id: student_grade.id, course_id: @course.id)
+    assert course_student.save!
 
+    assignment_user = AssignmentGrade.create(assignment_id: @assignment.id, course_student_id: course_student.student_id)
+    assert assignment_user.save!
+
+    assert student_grade.id == course_student.student_id
+
+    assert course_student.student_id == assignment_user.course_student_id
+
+    assert assignment_user.course_student_id == student_grade.id
+  end
+
+  def test_that_a_course_has_many_students_through_courses_course_students
+    student = User.create(last_name: "Ro", first_name: "Laren", email: "solongandthanksforallthefeds@maquis.com", photo_url: "https://www.maquis.com/raiders/ro_laren.jpg")
+    assert student.persisted?
+    assert student.save!
+
+    student1 = User.create(last_name: "Zek", first_name: "Grand Nagus", email: "ruleofacquisition32@latinum.com", photo_url: "https://www.latinum.com/aintizekksy.png")
+    assert student1.persisted?
+    assert student.save!
+
+    CourseStudent.create(student: student, course: @course)
+
+    CourseStudent.create(student: student1, course: @course)
+
+    assert_equal 2, @course.students.length
+  end
+
+  def test_that_a_course_is_tied_to_its_primary_instructor
+  # The primary instructor is the one who is referenced by a course_instructor which has its primary flag set to true.
+    course_primary_inst = Course.create(name: "I'm the only instructor", course_code: "ncc5678")
+    assert course_primary_inst.persisted?
+    assert course_primary_inst.save!
+
+    primary_inst_user = User.new(last_name: "Noonien Singh", first_name: "Khan", email: "gonnablowuptheenterprise@outcast.net", photo_url: "https://heresmypicsuckas.png")
+
+    primary_inst = CourseInstructor.create(course: course_primary_inst, instructor: primary_inst_user, primary: true)
+    assert primary_inst.persisted?
+    assert primary_inst.save!
+
+    p course_primary_inst.primary_instructor
+    assert course_primary_inst.primary_instructor == primary_inst_user
+  end
 
 end
