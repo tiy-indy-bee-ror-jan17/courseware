@@ -7,6 +7,9 @@ class Course < ActiveRecord::Base
 
   has_many        :readings, through: :lessons
   has_many        :lessons
+  # has_many        :students, through: :course_students
+
+  
 # Validate that the course_code starts with three letters
 # and ends with three numbers. Use a regular expression.
 # validates
