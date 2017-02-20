@@ -13,6 +13,11 @@ class User < ActiveRecord::Base
 
   default_scope { order('last_name, first_name') }
 
+  has_many :course_instructors, foreign_key: "instructor_id"
+
+  has_many :course_students, foreign_key: "students_id"
+
+
   def full_name
     "#{title + " " if title}#{first_name} #{padded_middle_initial}#{last_name}"
   end

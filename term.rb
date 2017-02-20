@@ -3,7 +3,7 @@ class Term < ActiveRecord::Base
   default_scope { order('ends_on DESC') }
 
   belongs_to :school
-  has_many :courses
+  has_many :courses, dependent: :restrict_with_error
 
   validates :name, presence: true
   validates :starts_on, presence: true
