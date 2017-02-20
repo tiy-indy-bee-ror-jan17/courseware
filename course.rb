@@ -9,8 +9,14 @@ class Course < ActiveRecord::Base
   has_many :students, class_name: "User",
                       foreign_key: "student_id",
                       through: :course_students
-  has_many :instructors, through: :course_instructors,
-                         dependent: :restrict_with_error
+  has_many :instructors, through: :course_instructors,dependent: :restrict_with_error
+
+  validates :name, presence: true
+
+  validates :course_code,
+            presence: true,
+            format: { with: /[a-zA-Z][a-zA-Z][a-zA-Z].*\d\d\d/ },
+            uniqueness: true
 
   # has_one :primary_instructor, through: :course_instructor
 
