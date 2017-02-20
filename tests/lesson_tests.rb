@@ -34,7 +34,6 @@ class LessonTest < Minitest::Test
 
   def test_lessons_have_child_lessons_and_child_lessons_have_a_parent
     child = Lesson.create(parent_lesson_id: @lesson.id, name: 'child_lesson')
-    # binding.pry
     assert @lesson.child_lessons.count == 1
     assert @lesson.child_lessons[0] == child
     assert child.parent_lesson == @lesson
