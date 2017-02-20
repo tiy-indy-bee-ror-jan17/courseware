@@ -1,5 +1,22 @@
 class Course < ActiveRecord::Base
 
+  validates :name, presence: true
+  validates :course_code, presence: true,
+                          uniqueness: {scope: :term_id},
+                          format: {with: /\A\D{3}.*\d{3}\z/} #begin with 3 letters and end with 3 digits
+
+  belongs_to :term
+
+  has_many :course_instructors, dependent: :restrict_with_error
+  has_many :course_students, dependent: :restrict_with_error
+  has_many :assignments, dependent: :destroy
+  has_many :lessons, dependent: :destroy
+  has_many :readings, through: :lessons
+  has_many :students, through: :course_students
+  has_many :instructors, through: :course_instructors
+
+  has_one :primary_instructor, ->{ where(primary: true) }, class_name: 'CourseInstructor'
+
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
 
   # Magic number also used in old? method below.
