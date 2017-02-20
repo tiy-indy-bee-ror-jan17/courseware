@@ -8,7 +8,6 @@ require 'pry'
 # Include both the migration and the app itself
 require './migration'
 require './application'
-require './'
 
 # Overwrite the development database connection with a test connection.
 ActiveRecord::Base.establish_connection(
@@ -25,10 +24,10 @@ ApplicationMigration.migrate(:up)
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
-  def setup
-    @user = user.find_or_create_by!(first_name: "Chuck", last_name: Faker::Name.last_name)
-    assert @user.persisted?
-  end
+  # def setup
+  #   @user = user.find_or_create_by!(first_name: "Chuck", last_name: Faker::Name.last_name)
+  #   assert @user.persisted?
+  # end
 
   def test_school_has_a_term_method
     school = School.create
@@ -403,7 +402,7 @@ class ApplicationTest < Minitest::Test
     new_a_g = AssignmentGrade.create
     new_c_s = CourseStudent.create
     new_c_s.assignment_grades << new_a_g
-    assert new_c_s.assignment_grades == 1
+    assert new_c_s.assignment_grades.count == 1
   end
 
 end
