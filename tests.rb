@@ -23,6 +23,11 @@ ApplicationMigration.migrate(:up)
 # Finally!  Let's test the thing.
 class ApplicationTest < Minitest::Test
 
+  # def setup
+  #   @user = user.find_or_create_by!(first_name: "Chuck", last_name: Faker::Name.last_name)
+  #   assert @user.persisted?
+  # end
+
   def test_school_has_a_term_method
     school = School.create
     assert school.respond_to?(:terms)
@@ -381,7 +386,7 @@ class ApplicationTest < Minitest::Test
     assert course.save
   end
 
-  def test_courseinstructor_associatedwith_instructior
+  def test_students_association_with_course_students
     user = User.create(
             first_name: 'Chris',
             last_name:  'Vannoy',
@@ -440,4 +445,25 @@ class ApplicationTest < Minitest::Test
       assert assignment2.save
   # end
   end
+
+  def test_courseinstructor_associatedwith_instructior
+    new_user = User.create(
+        first_name: 'Chris',
+        last_name:  'Vannoy',
+        email:      'cvannoy@ironyard.com',
+        photo_url:  'https://www.pix.com'
+        )
+    new_course_student = CourseStudent.create(student_id: new_user.id)
+    assert new_course_student.student.id == new_user.id
+  end
+
+  def test_assignment_grade_belongs_to_course_student
+    new_a_g = AssignmentGrade.create
+    assert new_a_g.persisted?
+    new_c_s = CourseStudent.create
+    assert new_c_s.persisted?
+    new_c_s.assignment_grades << new_a_g
+    assert new_c_s.assignment_grades.count == 1
+  end
+
 end
