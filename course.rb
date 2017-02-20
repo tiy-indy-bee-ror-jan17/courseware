@@ -2,6 +2,7 @@ class Course < ActiveRecord::Base
 
   has_many :lessons
   has_many :course_instructors
+  has_many :instructors, through: :course_instructors
 
   belongs_to :term
   has_many :course_students, dependent: :restrict_with_error
