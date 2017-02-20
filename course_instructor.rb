@@ -1,7 +1,7 @@
 class CourseInstructor < ActiveRecord::Base
 
   belongs_to :course
-  has_many :instructors,  foreign_key:  'instructor_id',
-                          class_name:   'User'
+  # belongs_to :user, foreign_key: "instructor_id"
+  belongs_to :instructor, class_name: "User"
 
 end
