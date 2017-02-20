@@ -42,7 +42,7 @@ class User < ActiveRecord::Base
   end
 
   def enrolled?(course)
-    courses_taken.include?(course)
+    courses.find_by(id: course.id)
   end
 
   def teaching?(course)
