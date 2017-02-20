@@ -67,14 +67,43 @@ class ApplicationTest < Minitest::Test
     assert_equal "lesson 1", @reading1.lesson.name
   end
 
+  def test_lesson_destoyed_destroys_reading
+    lesson = Lesson.create(name: "testlesson", course: @course1)
+    reading = Reading.create(caption: "testreading", lesson: lesson, order_number: 6, url: "http://test.reading")
+    assert Reading.exists?(id: reading)
+    assert Lesson.exists?(id: lesson)
+    lesson.destroy
+    refute Reading.exists?(id: reading)
+    refute Lesson.exists?(id: lesson)
+  end
+
   def test_lessons_has_courses
     assert @course1.lessons.length > 1
     assert_equal "course 1", @lesson1.course.name
   end
 
+  def test_course_destroyed_destroys_lesson
+    course = Course.create(name: "coursetest", term: @term1, course_code: "phi401")
+    lesson = Lesson.create(name: "testlesson", course: course)
+    assert Course.exists?(id: course)
+    assert Lesson.exists?(id: lesson)
+    course.destroy
+    refute Course.exists?(id: course)
+    refute Lesson.exists?(id: lesson)
+  end
+
   def test_courseinstructor_has_courses
     assert @course1.course_instructors.length > 1, @course1.course_instructors.length
     assert_equal "course 1", @course_instructor1.course.name
+  end
+
+  def test_course_cant_be_destroyed_if_course_instructor_exists
+    course = Course.create(name: "coursetest", term: @term1, course_code: "phi401")
+    assert Course.exists?(id: course)
+    course.destroy
+    refute Course.exists?(id: course)
+    @course1.destroy
+    assert Course.exists?(id: @course1)
   end
 
   def test_school_has_terms
