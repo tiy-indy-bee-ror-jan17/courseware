@@ -26,8 +26,9 @@ class ApplicationTest < Minitest::Test
 
   def setup
     @user = User.find_or_create_by(first_name: "never", last_name: "nude", email: "email@email.com", photo_url: "http://nevernudephotos" )
-    @student1 = User.find_or_create_by(first_name: "student", last_name: "one", email: "one@student.com", photo_url: "https://maybe")
-    @student2 = User.find_or_create_by(first_name: "student", last_name: "two", email: "two@student.com" )
+    @student1 = User.find_or_create_by(first_name: "astudent", last_name: "a", email: "one@student.com", photo_url: "https://maybe")
+    @student2 = User.find_or_create_by(first_name: "bstudent", last_name: "b", email: "two@student.com" )
+    @student3 = User.find_or_create_by(first_name: "zeb", last_name: "a", email: "three@student.com")
     @instructor1 = User.find_or_create_by(first_name: "instructor", last_name: "one", email: "one@instructor.com")
     @instructor2 = User.find_or_create_by(first_name: "instructor", last_name: "two", email: "two@instructor.com")
     @instructor3 = User.find_or_create_by(first_name: "instructor3", last_name: "three", email: "three@instructor.com")
@@ -45,6 +46,7 @@ class ApplicationTest < Minitest::Test
 
     @course_student1 = CourseStudent.find_or_create_by(course: @course1, student: @student1)
     @course_student2 = CourseStudent.find_or_create_by(course: @course1, student: @student2)
+    @course_student3 = CourseStudent.find_or_create_by(course: @course1, student: @student3)
 
     @assignment1 = Assignment.find_or_create_by(name: "assignment 1", course: @course1, percent_of_grade: 0.72)
     @assignment2 = Assignment.find_or_create_by(name: "assignment 2", course: @course1, percent_of_grade: 0.86)
@@ -230,7 +232,7 @@ class ApplicationTest < Minitest::Test
 
   def test_associate_coursestudents_with_users
     refute_equal 0, @student1.course_students.count
-    assert_equal "one", @course_student1.student.last_name
+    assert_equal "a", @course_student1.student.last_name
   end
 
   def test_associate_coursestudents_with_assignment_grades
@@ -249,5 +251,11 @@ class ApplicationTest < Minitest::Test
     assert @course_instructor2.valid?
     assert course_instructor_a.errors.full_messages.include?("Primary instructor can only exist once per course")
     refute course_instructor_a.valid?
+  end
+
+  def test_students_ordered_by_lastname_then_firstname
+    assert_equal "astudent", @course1.students.first.first_name
+    assert_equal "zeb", @course1.students.second.first_name
+    assert_equal "bstudent", @course1.students.third.first_name
   end
 end
