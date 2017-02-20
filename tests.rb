@@ -1,7 +1,6 @@
 # Basic test requires
 require 'minitest/autorun'
 require 'minitest/pride'
-
 require 'pry'
 
 
@@ -388,19 +387,81 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_students_association_with_course_students
-    new_user = User.create(
+    user = User.create(
             first_name: 'Chris',
             last_name:  'Vannoy',
             email:      'cvannoy@ironyard.com',
             photo_url:  'https://www.pix.com'
             )
+    assert user.save
+    ci   = CourseInstructor.create(
+        instructor_id:  user.id)
+    assert ci.save
+    assert ci.instructor_id == user.id
+  end
+
+  def test_assignment_associatedwith_assignmentgrade
+    assignment = Assignment.create(
+      course_id: 'acp432',
+      name:      'Accelerated Learning',
+      percent_of_grade: 85
+      )
+    assert assignment.save
+    assignment_grade = AssignmentGrade.create
+    assert assignment_grade.save
+    assignment.assignment_grades << assignment_grade
+    assert assignment.assignment_grades.count > 0
+  end
+
+  #Course to have many instructors through the Course's course_instructors.
+  def test_course_linkedto_courseinstructors
+    course = Course.create(
+      course_code: 'abw123',
+      name: 'Python 871'
+      )
+    ci = CourseInstructor.create(
+        instructor_id:  :user_id)
+    assert ci.save
+    course.course_instructors << ci
+    assert course.course_instructors.count > 0
+  end
+
+  def test_assignment_dueat_notpriorto_aciveat
+    assignment = Assignment.create(
+      name: 'Rob',
+      course_id: 'act005',
+      percent_of_grade: 20,
+      active_at: '1501-01-02',
+      due_at:    '1500-01-01'
+      )
+      refute assignment.save
+      assignment2 = Assignment.create(
+        name: 'Rob67654',
+        course_id: 'aft005',
+        percent_of_grade: 20,
+        active_at: '1501-01-02',
+        due_at:    '1501-01-04'
+        )
+      assert assignment2.save
+  # end
+  end
+
+  def test_courseinstructor_associatedwith_instructior
+    new_user = User.create(
+        first_name: 'Chris',
+        last_name:  'Vannoy',
+        email:      'cvannoy@ironyard.com',
+        photo_url:  'https://www.pix.com'
+        )
     new_course_student = CourseStudent.create(student_id: new_user.id)
     assert new_course_student.student.id == new_user.id
   end
 
   def test_assignment_grade_belongs_to_course_student
     new_a_g = AssignmentGrade.create
+    assert new_a_g.persisted?
     new_c_s = CourseStudent.create
+    assert new_c_s.persisted?
     new_c_s.assignment_grades << new_a_g
     assert new_c_s.assignment_grades.count == 1
   end
