@@ -1,6 +1,7 @@
 class Reading < ActiveRecord::Base
 
   belongs_to :lesson
+  
   validates :order_number, :lesson_id, :url, presence: true
   validates :url, format: { with: /\Ahttps?:\/\// }
 

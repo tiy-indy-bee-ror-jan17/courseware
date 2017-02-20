@@ -6,6 +6,9 @@ class Assignment < ActiveRecord::Base
   has_many :assignment_grades
 
   validate :cannot_be_due_before_active
+  validates :name, presence: true, uniqueness: { scope: :course_id}
+  validates :course_id, presence: true
+  validates :percent_of_grade, presence: true
 
   default_scope { order("assignments.due_at, assignments.active_at") }
 
