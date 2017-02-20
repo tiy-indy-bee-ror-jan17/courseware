@@ -5,7 +5,12 @@ class Lesson < ActiveRecord::Base
   belongs_to :pre_class_assignment, class_name: "Assignment"
   belongs_to :in_class_assignment,  class_name: "Assignment"
 
+  belongs_to :parent_lesson, class_name: "Lesson"
+  has_many :lessons, foreign_key: "parent_lesson_id"
+
   validates :name, presence: true
+
+  default_scope { order('id') }
 
   delegate :code_and_name, to: :course, prefix: true
 
