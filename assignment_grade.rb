@@ -5,6 +5,8 @@ class AssignmentGrade < ActiveRecord::Base
 
   scope :graded, -> { joins(:assignment).where("assignments.grades_released IS TRUE") }
 
+  belongs_to :course_student
+
   delegate :course, to: :assignment
   delegate :full_name, to: :course_student
 
