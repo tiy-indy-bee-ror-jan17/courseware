@@ -31,7 +31,7 @@ class ApplicationTest < Minitest::Test
     @course_two = Course.create(name: "Basic Warp Design", term: @term, course_code: "ncc74210")
     @course_student = CourseStudent.create(course: @course)
     @course_student_two = CourseStudent.create(course: @course)
-    @assignment = Assignment.create(course: @course, name: "Cochrane Theory for Dummies", course_id: @course.id, percent_of_grade: 0.25 )
+    @assignment = Assignment.create(course: @course, name: "Cochrane Theory for Dummies", course: @course, percent_of_grade: 0.25 )
     @assignment_two = Assignment.create(course: @course, name: "Transwarp Initiatives for cleaner space lanes", course_id: @course.id, percent_of_grade: 0.52)
     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment)
@@ -46,18 +46,23 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_school_has_many_terms
+    assert @school.persisted?
+    assert @school.terms.first == @term
     assert_equal 2, @school.terms.length
   end
 
   def test_term_belongs_to_school
+    assert @term.persisted?
     assert @term.school == @school
   end
 
   def test_term_has_many_courses
+    assert @term.persisted?
     assert_equal 2, @term.courses.length
   end
 
   def test_course_belongs_to_term
+    assert @course.persisted?
     assert @course.term == @term
   end
 
@@ -72,6 +77,7 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_course_student_belongs_to_course
+    assert @course_student.persisted?
     assert @course_student.course == @course
   end
 
@@ -178,9 +184,10 @@ class ApplicationTest < Minitest::Test
 
   def test_course_has_many_instructors_through_course_instructors
     user = User.create(first_name: "Test", last_name: "Test", email: "borg3@borg.com", photo_url: "http://borg2.com")
-    course_instructor = CourseInstructor.create(instructor: user, course: @course)
-    course_instructor2 = CourseInstructor.create(instructor: user, course: @course)
-    assert_equal 2, @course.instructors.length
+    # course_instructor = CourseInstructor.create(instructor: user, course: @course)
+    # course_instructor2 = CourseInstructor.create(instructor: user, course: @course)
+    @course.instructors << user
+    assert_equal 1, @course.instructors.length
   end
 
   def test_assignment_due_date_is_after_assignment_active_date
@@ -190,10 +197,13 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_assignments_are_ordered_by_due_at_then_active_at
-    course = Course.create(name: "Klingon Physiology", course_code: "ncc150")
-    assignment = Assignment.create(course: course, active_at: "1933-01-23", due_at: "1989-11-20")
-    assignment_two = Assignment.create(course: course, active_at: "1947-07-20", due_at: "1982-08-15")
-    assignment_three = Assignment.create(course: course, active_at: "1954-05-10", due_at: "1989-11-20")
+    course = Course.create!(name: "Klingon Physiology", course_code: "ncc150")
+    assignment = Assignment.create!(name: "Test Assignment 1", course: course, percent_of_grade: 0.36, active_at: "1933-01-23", due_at: "1989-11-20")
+    # assert assignment.persisted?
+    assignment_two = Assignment.create!(name: "Test Assignment 2", course: course, percent_of_grade: 0.21, active_at: "1947-07-20", due_at: "1982-08-15")
+    # assert assignment_two.persisted?
+    assignment_three = Assignment.create!(name: "Test Assignment 3", course: course, percent_of_grade: 0.23, active_at: "1954-05-10", due_at: "1989-11-20")
+    # assert assignment_three.persisted?
     assert_equal [assignment_two, assignment, assignment_three], course.assignments.to_a
   end
 
