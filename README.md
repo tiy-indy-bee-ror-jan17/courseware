@@ -45,17 +45,41 @@ The tasks will be divided as follows.  "Associate" means to place `has_many`, `b
 Person A:
 
 * Associate `schools` with `terms` (both directions).
+use the has_many/belongs_to relationship
+
 * Associate `terms` with `courses` (both directions).  If a term has any courses associated with it, the term should not be deletable.
+has_many/belongs_to relationship, but also make sure a dependent, restrict with error prevents terms from deleting if it contains courses. Test by destroying and refuting the destruction.  
+
 * Associate `courses` with `course_students` (both directions).  If the course has any students associated with it, the course should not be deletable.
+has_many/belongs_to relationship, same kind of restrict as terms and courses here. Test by destroying and refuting the destruction.
+
 * Associate `assignments` with `courses` (both directions).  When a course is destroyed, its assignments should be automatically destroyed.
-* Associate `lessons` with their `pre_class_assignments` (both directions).
+has_many/belongs_to relationship, destroy dependency as well.
+
+* Associate `lessons` with their `pre_class_assignments` (both directions). Foreign key assignment that specifically tells ruby the association to make.
+
+
 * Set up a School to have many `courses` through the school's `terms`.
+almost literal, just use a has_many relationship to show that "through: terms" you can show the school where to find courses.
+
 * Validate that Lessons have `names`.
+presence: true is validated under the Lessons class.
+
 * Validate that Readings must have an `order_number`, a `lesson_id`, and a `url`.
+use presence: true and call out the necessary fields
+
 * Validate that the Readings `url` must start with `http://` or `https://`.  Use a regular expression.
+validate the format of the url object. basically used rubular to find the regular expression for http and made sure the string started with that.
+
 * Validate that Courses have a `course_code` and a `name`.
+again, just validating presence and testing for circumstances where they do and do not have required fields.
+
 * Validate that the `course_code` is unique within a given `term_id`.
+validate the uniqueness and test options with and without unique term_id's
+
 * Validate that the `course_code` starts with three letters and ends with three numbers.  Use a regular expression.
+rubular made this easy. still not 100% on how to account for case sensitivity. I'll have to check that out later. 
+
 
 Person B:
 

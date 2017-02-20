@@ -1,6 +1,18 @@
 class Course < ActiveRecord::Base
 
+  has_many :instructors, through: :course_instructors
+  has_many :lessons, dependent: :destroy
+  has_many :course_instructors, dependent: :restrict_with_error
+
+  belongs_to :term
+  has_many :course_students, dependent: :restrict_with_error
+  has_many :assignments, dependent: :destroy
+  has_many :readings, through: :lessons
+  has_many :students, through: :course_students
+
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
+
+  validates :course_code, presence: true, uniqueness: true, format: {with: /\A[a-z]{3}\d{3}/i}
 
   # Magic number also used in old? method below.
   scope :active, -> { includes(:term).where("terms.ends_on >= ?", Time.now - 1.month) }
