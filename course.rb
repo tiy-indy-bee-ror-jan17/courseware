@@ -1,14 +1,16 @@
 class Course < ActiveRecord::Base
   belongs_to      :term
   belongs_to      :lessons
-  has_many        :course_students, dependent: :restrict_with_error
-  has_many        :instructors, through: :course_students
+  has_many        :course_students,
+                    dependent: :restrict_with_error
+  has_many        :instructors, through: :course_instructors
   has_many        :assignments, dependent: :destroy
   has_many        :readings, through: :lessons
   has_many        :lessons
-  # has_many        :students, through: :course_students
+  has_many        :students,
+                   through: :course_students
 
-  
+
 # Validate that the course_code starts with three letters
 # and ends with three numbers. Use a regular expression.
 # validates

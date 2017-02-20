@@ -466,4 +466,66 @@ class ApplicationTest < Minitest::Test
     assert new_c_s.assignment_grades.count == 1
   end
 
+  def test_course_has_many_students_through_course_students
+    new_user = User.create(
+            first_name: 'Chris',
+            last_name:  'Vannoy',
+            email:      'cvannoy1@ironyard.com',
+            photo_url:  'https://www.pix.com'
+            )
+    assert new_user.persisted?
+    new_course = Course.create(
+      course_code: 'abc123',
+      name: 'Python 301'
+      )
+    assert new_course.persisted?
+    new_student = CourseStudent.create(student_id: new_user.id, course_id: new_course.id)
+    assert new_student.persisted?
+    new_course.course_students << new_student
+    assert new_course.students.count == 1
+    assert new_course.students.first == new_user
+  end
+
+  def test_course_has_one_primary_instructor
+    new_user1 = User.create(
+            first_name: 'Chrisss',
+            last_name:  'Vannoy',
+            email:      'cvannoy1@ironyard.com',
+            photo_url:  'https://www.pix.com',
+            instructor: true
+            )
+    assert new_user1.persisted?
+    new_user2 = User.create(
+            first_name: 'Chrisst',
+            last_name:  'Vannoy',
+            email:      'cvannoy1@ironyard.com',
+            photo_url:  'https://www.pix.com',
+            instructor: true
+            )
+    assert new_user2.persisted?
+    new_course = Course.create(
+      course_code: 'qwe123',
+      name: 'Python 305'
+      )
+    assert new_user2.persisted?
+    new_instructor1 = CourseInstructor.create(
+          primary: true,
+          instructor_id: new_user1.id,
+          course_id: new_course.id
+          )
+    assert new_instructor1.persisted?
+    new_instructor2 = CourseInstructor.create(
+          primary: false,
+          instructor_id: new_user2.id,
+          course_id: new_course.id
+          )
+    assert new_instructor2.persisted?
+    new_course.course_instructors << new_instructor1
+    new_course.course_instructors << new_instructor2
+    # p new_course.instructors.methods
+    assert new_course.instructors.count == 2
+    assert new_instructor1.primary == true && new_instructor1.course_id == new_course.id
+    refute new_instructor2.primary == true && new_instructor2.course_id == new_course.id
+  end
+
 end

@@ -2,6 +2,10 @@ class CourseStudent < ActiveRecord::Base
   belongs_to    :course
   has_many      :assignment_grades
 
+  has_many :assignment_grades,
+            foreign_key: "course_student_id"
+            
+
   belongs_to :student,
               foreign_key:"student_id",
               class_name: "User"
