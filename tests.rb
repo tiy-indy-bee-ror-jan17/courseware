@@ -271,20 +271,20 @@ class ApplicationTest < Minitest::Test
 
     #Adventure tests
 
-  # def test_associate_coursestudents_with_users
-  #   refute_equal 0, @student1.course_students.count
-  #   assert_equal "a", @course_student1.student.last_name
-  # end
+  def test_associate_coursestudents_with_users
+    refute_equal 0, @student1.course_students.count
+    assert_equal "a", @course_student1.student.last_name
+  end
 
   def test_associate_coursestudents_with_assignment_grades
     refute_equal 0, @course_student1.assignment_grades.count
     assert @assignment_grade1.respond_to?("course_student")
   end
 
-  # def test_courses_have_many_students_through_course_students
-  #   refute_equal 0, @student1.courses.count
-  #   refute_equal 0, @course1.students.count
-  # end
+  def test_courses_have_many_students_through_course_students
+    refute_equal 0, @student1.courses.count
+    refute_equal 0, @course1.students.count
+  end
 
   def test_associate_course_with_one_primary_instructor
 
@@ -293,6 +293,8 @@ class ApplicationTest < Minitest::Test
     assert course_instructor_a.errors.full_messages.include?("Primary instructor can only exist once per course")
     refute course_instructor_a.valid?
   end
+
+  #EPIC MODE
 
   def test_students_ordered_by_lastname_then_firstname
     assert_equal "astudent", @course1.students.first.first_name
