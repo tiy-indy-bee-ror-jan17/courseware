@@ -12,8 +12,8 @@ class UserTest < MiniTest::Test
     user2 = User.create(first_name: 'Turanga', last_name: 'Fry', email: 'apt1i@leela.com')
     user3 = User.create(first_name: 'Count', last_name: 'Chocula', email: 'choc@choco.com')
 
-    assert user1.valid?
-    assert user2.valid?
+    assert user1.persisted?
+    assert user2.persisted?
     assert user3.errors.full_messages.include?('Email has already been taken')
   end
 
@@ -22,7 +22,7 @@ class UserTest < MiniTest::Test
     user1 = User.create(first_name: 'White', last_name: 'Mage', email: 'healbot@heals.com')
     user2 = User.create(first_name: 'Red', last_name: 'Mage', email: 'refreshmeplz')
 
-    assert user1.valid?
+    assert user1.persisted?
     assert user2.errors.full_messages.include?('Email is invalid')
   end
 
@@ -31,8 +31,8 @@ class UserTest < MiniTest::Test
     user2 = User.create(first_name: 'Lucille', last_name: 'Bluth', email: 'thirsty@vodka.com', photo_url: 'http://motherboyxxx.com')
     user3 = User.create(first_name: 'Gene', last_name: 'Parmesan', email: 'ahhhhh@itsgene.com', photo_url: 'idiotwithballoons.com')
 
-    assert user1.valid?
-    assert user2.valid?
+    assert user1.persisted?
+    assert user2.persisted?
     assert user3.errors.full_messages.include?('Photo url is invalid')
   end
 
@@ -55,7 +55,7 @@ class UserTest < MiniTest::Test
     student3 = User.create(first_name: 'Algernop', last_name: 'Krieger', email: 'drkrieger@isis.com')
     student4 = User.create(first_name: 'Cheryl', last_name: 'Tunt', email: 'neckbones@isis.com')
 
-    course = Course.create(name: 'course', course_code: 'cod123')
+    course = Course.create(name: 'course', course_code: rand_course_code)
 
     cs1 = CourseStudent.create(student_id: student1.id, course_id: course.id)
     cs2 = CourseStudent.create(student_id: student2.id, course_id: course.id)
