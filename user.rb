@@ -1,5 +1,34 @@
 class User < ActiveRecord::Base
 
+# This has many definition returns the course_instructors table
+#   has_many :courses,             class_name: "CourseInstructor",
+#                                  foreign_key: "instructor_id"
+#           new_instructor1.courses
+# We want the actual courses, so how to get them without breaking the use of
+# courses below...
+# try using what Chris showed about primary instructor.... source....
+# later try changing the student course relationship also if time...
+
+  has_many :course_instructors,    class_name: "CourseInstructor",
+                                   foreign_key: "instructor_id"
+  has_many :taught_courses,      through: :course_instructors,
+                                 foreign_key: "instructor_id",
+                                 source: :course
+
+
+   has_many :courses,       class_name: "CourseStudent",
+                            foreign_key: "student_id"
+
+
+
+
+
+  validates :first_name, presence: true
+  validates :last_name, presence: true
+  validates :email, presence: true, uniqueness: true, format:  { with: /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/ }
+  validates :photo_url, format: { with: /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix }
+
+
   scope :want_to_be_instructors, -> { where(wants_to_be_instructor: true) }
   scope :instructors_for_school_id, ->(school_id) { where(school_id: school_id, instructor: true) }
 
