@@ -2,7 +2,7 @@ require 'pry'
 class CourseTest < Minitest::Test
 
   def setup
-    @course = Course.create(name: 'course', course_code: rand_course_code)
+    @course ||= Course.create(name: 'course', course_code: rand_course_code)
     @lesson = Lesson.create(course_id: @course.id, name: 'lesson')
   end
 
@@ -17,15 +17,15 @@ class CourseTest < Minitest::Test
   end
 
   def test_course_cannot_be_deleted_when_it_has_course_instructor
-    instructor = CourseInstructor.create(course_id: @course.id)
-    @course.destroy
-    refute @course.destroy
-    assert_equal 1, @course.course_instructors.count
+    course = Course.create(name: 'course', course_code: rand_course_code)
+    instructor = CourseInstructor.create(course_id: course.id)
+    course.destroy
+    refute course.destroy
+    assert_equal 1, course.course_instructors.count
   end
 
   def test_a_course_has_readings_through_lessons
     reading = Reading.create(lesson_id: @lesson.id, order_number: '1', url: 'http://url.com')
-    # binding.pry
     assert @course.readings.count == 1
   end
 
