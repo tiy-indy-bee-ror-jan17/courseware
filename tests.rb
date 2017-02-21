@@ -30,20 +30,12 @@ class ApplicationTest < Minitest::Test
     @course_two = Course.create(name: "Basic Warp Design", term: @term, course_code: "ncc74210")
     @course_student = CourseStudent.create(course: @course)
     @course_student_two = CourseStudent.create(course: @course)
-# <<<<<<< HEAD
     @assignment = Assignment.create(name: "Cochrane Theory for Dummies", course: @course, active_at: "1933-01-23", due_at: "1989-11-20", percent_of_grade: 0.25)
     @assignment_two = Assignment.create(name: "Transwarp Initiatives for cleaner space lanes", course: @course, active_at: "1947-07-20", due_at: "1982-08-15", percent_of_grade: 0.52)
     @assignment_three = Assignment.create(name: "Test Assignment Three", course: @course, active_at: "1954-05-10", due_at: "1989-11-20", percent_of_grade: 0.34)
     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment, parent_lesson: @lesson)
     @lesson_three = Lesson.create(name: "Third Lesson", parent_lesson: @lesson)
-# =======
-#     @assignment = Assignment.create(course: @course, name: "Cochrane Theory for Dummies", percent_of_grade: 0.25, active_at: "1933-01-23", due_at: "1989-11-20")
-#     @assignment_two = Assignment.create(course: @course, name: "Transwarp Initiatives for cleaner space lanes", percent_of_grade: 0.52, active_at: "1947-07-20", due_at: "1982-08-15")
-#     @assignment_three = Assignment.create(name: "Test Assignment Three", course: @course, active_at: "1954-05-10", due_at: "1989-11-20", percent_of_grade: 0.34)
-#     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
-#     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment, parent_lesson_id: @lesson)
-# >>>>>>> master
     @assignment_grade = AssignmentGrade.create(assignment: @assignment)
     @assignment_grade_two = AssignmentGrade.create(assignment: @assignment)
   end
@@ -97,11 +89,6 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_courses_have_many_assignments
-# <<<<<<< HEAD
-#     assert @course.assignments.first == @assignment_two
-#     assert @course.assignments.last == @assignment_three
-# =======
-# >>>>>>> master
     assert_equal 3, @course.assignments.length
   end
 
@@ -232,6 +219,8 @@ class ApplicationTest < Minitest::Test
     assert_equal @lesson, @lesson_three.parent_lesson
   end
 
+# The following is Person A's version of test
+# Person B also wrote a test for the same problem
   def test_child_lessons_are_ordered_by_id
     lesson = Lesson.create(name: "Parent Lesson")
     lesson1 = Lesson.create(name: "First Child Lesson")
