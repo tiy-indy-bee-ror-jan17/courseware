@@ -1,7 +1,7 @@
 class AssignmentTest < MiniTest::Test
 
   def setup
-    @course = Course.create(name: rand_a_z, course_code: rand_course_code)
+    @course ||= Course.create(name: rand_a_z, course_code: rand_course_code)
   end
 
   def test_assignments_have_course_id_and_name_and_percent_of_grade

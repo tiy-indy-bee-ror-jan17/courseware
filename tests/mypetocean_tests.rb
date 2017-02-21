@@ -4,9 +4,9 @@ class MyPetOceanTest < Minitest::Test
   def setup
     @school = School.find_or_create_by!(name: 'school')
     @term = Term.find_or_create_by!(school_id: @school.id, name: 'term', starts_on: '1989-10-01', ends_on: '1999-12-31')
-    @course = Course.find_or_create_by!(name: 'Catbutt & Other Specist Terms', course_code: rand_course_code, term_id: @term.id)
+    @course ||= Course.create!(name: 'Catbutt & Other Specist Terms', course_code: rand_course_code, term_id: @term.id)
     @course_student = CourseStudent.find_or_create_by!(course_id: @course.id)
-    @assignment = Assignment.find_or_create_by!(course_id: @course.id, name: 'Destroy C-138', percent_of_grade: '89', due_at: '2017-03-18 21:06:59.001', active_at: '2017-01-19 20:04:59.001')
+    # @assignment = Assignment.find_or_create_by!(course_id: @course.id, name: 'Destroy C-138', percent_of_grade: '89', due_at: '2017-03-18 21:06:59.001', active_at: '2017-01-19 20:04:59.001')
     @pre_class_assignment = Assignment.find_or_create_by!(course_id: @course.id, name: 'Destroy C-139', percent_of_grade: '89', due_at: '2017-07-18 21:06:59.001', active_at: '2016-12-18 21:06:59.001')
     @pre_class_lesson = Lesson.find_or_create_by!(pre_class_assignment_id: @pre_class_assignment.id, name: 'Karl Jaspers')
     @lesson = Lesson.find_or_create_by!(name: 'Miguel de Unamuno')

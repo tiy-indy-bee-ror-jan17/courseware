@@ -2,7 +2,7 @@ require 'pry'
 class LessonTest < Minitest::Test
 
   def setup
-    @course = Course.create(name: 'course', course_code: rand_course_code)
+    @course ||= Course.create(name: 'course', course_code: rand_course_code)
     @lesson = Lesson.create(name: 'lesson', course_id: @course.id)
   end
 

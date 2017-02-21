@@ -16,7 +16,7 @@ ApplicationMigration.migrate(:up)
 require_relative 'tests/user_tests'
 require_relative 'tests/assignment_tests'
 require_relative 'tests/misc_tests'
-require_relative 'tests/mypetocean_tests'
+# require_relative 'tests/mypetocean_tests'
 require_relative 'tests/lesson_tests'
 require_relative 'tests/course_tests'
 require_relative 'tests/tag_tests'
