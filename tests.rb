@@ -30,12 +30,20 @@ class ApplicationTest < Minitest::Test
     @course_two = Course.create(name: "Basic Warp Design", term: @term, course_code: "ncc74210")
     @course_student = CourseStudent.create(course: @course)
     @course_student_two = CourseStudent.create(course: @course)
+# <<<<<<< HEAD
     @assignment = Assignment.create(name: "Cochrane Theory for Dummies", course: @course, active_at: "1933-01-23", due_at: "1989-11-20", percent_of_grade: 0.25)
     @assignment_two = Assignment.create(name: "Transwarp Initiatives for cleaner space lanes", course: @course, active_at: "1947-07-20", due_at: "1982-08-15", percent_of_grade: 0.52)
     @assignment_three = Assignment.create(name: "Test Assignment Three", course: @course, active_at: "1954-05-10", due_at: "1989-11-20", percent_of_grade: 0.34)
     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment, parent_lesson: @lesson)
     @lesson_three = Lesson.create(name: "Third Lesson", parent_lesson: @lesson)
+# =======
+#     @assignment = Assignment.create(course: @course, name: "Cochrane Theory for Dummies", percent_of_grade: 0.25, active_at: "1933-01-23", due_at: "1989-11-20")
+#     @assignment_two = Assignment.create(course: @course, name: "Transwarp Initiatives for cleaner space lanes", percent_of_grade: 0.52, active_at: "1947-07-20", due_at: "1982-08-15")
+#     @assignment_three = Assignment.create(name: "Test Assignment Three", course: @course, active_at: "1954-05-10", due_at: "1989-11-20", percent_of_grade: 0.34)
+#     @lesson = Lesson.create(name: "First Lesson", pre_class_assignment: @assignment)
+#     @lesson_two = Lesson.create(name: "Second Lesson", pre_class_assignment: @assignment, parent_lesson_id: @lesson)
+# >>>>>>> master
     @assignment_grade = AssignmentGrade.create(assignment: @assignment)
     @assignment_grade_two = AssignmentGrade.create(assignment: @assignment)
   end
@@ -89,8 +97,11 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_courses_have_many_assignments
-    assert @course.assignments.first == @assignment_two
-    assert @course.assignments.last == @assignment_three
+# <<<<<<< HEAD
+#     assert @course.assignments.first == @assignment_two
+#     assert @course.assignments.last == @assignment_three
+# =======
+# >>>>>>> master
     assert_equal 3, @course.assignments.length
   end
 
@@ -430,6 +441,7 @@ class ApplicationTest < Minitest::Test
     assert assignment_has_pog.save
   end
 
+  #B-Test-13
   def test_that_the_assignment_name_is_unique_within_a_given_course_id
     assignment_unique = Assignment.new(name: "Avoiding Transporter Buffer Overruns", course_id: @course.id, percent_of_grade: 0.30 )
     assert assignment_unique.save
@@ -440,6 +452,7 @@ class ApplicationTest < Minitest::Test
   end
 
   #B Adventurer Mode
+  #B-Test-14
   def test_that_course_students_are_associated_with_students
     new_user = User.create(first_name: "Alexander", last_name: "Rozhenko", email: "mydadisawarrior@ds9.com", photo_url: "https://vignette2.wikia.nocookie.net/startrek/images/8/8c/Alexander2374.jpg/revision/latest?cb=20060627132913")
     assert new_user.save!
@@ -448,6 +461,7 @@ class ApplicationTest < Minitest::Test
     assert course_student.student_id == new_user.id
   end
 
+  #B-Test-15
   def test_that_course_students_are_associated_with_assignment_grades
     student_grade = User.new(last_name: "Sito", first_name: "Jaxa", email: "blindfoldedbutstillwinning@enterprise.com", photo_url: "https://vignette2.wikia.nocookie.net/memoryalpha/images/d/df/Sito_jaxa.jpg/revision/latest?cb=20141207024353&path-prefix=en")
     assert student_grade.save!
@@ -465,6 +479,7 @@ class ApplicationTest < Minitest::Test
     assert assignment_user.course_student_id == student_grade.id
   end
 
+  #B-Test-16
   def test_that_a_course_has_many_students_through_courses_course_students
     student = User.create(last_name: "Ro", first_name: "Laren", email: "solongandthanksforallthefeds@maquis.com", photo_url: "https://www.maquis.com/raiders/ro_laren.jpg")
     assert student.persisted?
@@ -481,6 +496,7 @@ class ApplicationTest < Minitest::Test
     assert_equal 2, @course.students.length
   end
 
+  #B-Test-17
   def test_that_a_course_is_tied_to_its_primary_instructor
   # The primary instructor is the one who is referenced by a course_instructor which has its primary flag set to true.
     course_primary_inst = Course.create(name: "I'm the only instructor", course_code: "ncc5678")
@@ -494,6 +510,65 @@ class ApplicationTest < Minitest::Test
     assert primary_inst.save!
 
     assert course_primary_inst.primary_instructor == primary_inst_user
+  end
+
+  #B Epic Mode
+  #B-Test-18
+  def test_that_a_courses_students_are_ordered_by_last_name_first_name
+    user3 = User.find_or_create_by(last_name: "Of Nine", first_name: "Seven", email: "iresisted@voyager.com", photo_url: "https://www.voyager.com/personnel/biotech.png")
+    assert user3.persisted?
+    assert user3.save!
+
+    user2 = User.find_or_create_by(last_name: "Paris", first_name: "Tom", email: "haveyouseenmeflythisthing@voyager.com", photo_url: "https://www.voyager.com/personnel/tomparis.jpg")
+    assert user2.persisted?
+    assert user2.save!
+
+    user1 = User.find_or_create_by(last_name: "Torres",  first_name: "B'elanna", email: "batlethtotheeyes@voyager.com", photo_url:"https://www.voyager.com/personnel/imarriedtommy.jpg")
+    assert user1.persisted?
+    assert user1.save!
+
+    course = Course.create(name: "Sorting for blockheads", course_code: "ncc5985")
+
+    course.students << user1
+    course.students << user2
+    course.students << user3
+
+    assert course.students.first ==  user3
+  end
+
+  def test_that_child_lessons_are_sorted_by_their_ids
+    parent_lesson = Lesson.find_or_create_by!(name: "Testing child lessons are sorted by their IDs")
+    assert parent_lesson.persisted?
+    assert parent_lesson.save!
+
+    child_lesson1 = Lesson.create(name: "Child Lesson 1", parent_lesson_id: parent_lesson.id)
+    assert child_lesson1.persisted?
+    assert child_lesson1.save!
+
+    child_lesson2 = Lesson.create(name: "Child Lesson 2", parent_lesson_id: parent_lesson.id)
+    assert child_lesson2.persisted?
+    assert child_lesson2.save!
+
+    child_lesson3 = Lesson.create(name: "Child Lesson 3", parent_lesson_id: parent_lesson.id)
+    assert child_lesson3.persisted?
+    assert child_lesson3.save!
+
+    parent_lesson.child_lessons << child_lesson3
+    parent_lesson.child_lessons << child_lesson1
+    parent_lesson.child_lessons << child_lesson2
+
+    assert parent_lesson.child_lessons.first == child_lesson1
+
+    # sort = []
+    # sort << child_lesson3
+    # sort << child_lesson1
+    # sort << child_lesson2
+    # sort << parent_lesson
+    # refute sort[0] == child_lesson1
+    #
+    # sort.sort!
+    # assert sort[1] == child_lesson1
+
   end
 
 end
