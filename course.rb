@@ -1,5 +1,25 @@
 class Course < ActiveRecord::Base
 
+  belongs_to :term
+  has_many :lessons
+  has_many :course_students, dependent: :restrict_with_error
+  has_many :assignments, dependent: :destroy
+  has_many :course_instructors
+  has_many :readings, through: :lessons
+  has_many :students, class_name: "User",
+                      foreign_key: "student_id",
+                      through: :course_students
+  has_many :instructors, through: :course_instructors,dependent: :restrict_with_error
+
+  validates :name, presence: true
+
+  validates :course_code,
+            presence: true,
+            format: { with: /[a-zA-Z][a-zA-Z][a-zA-Z].*\d\d\d/ },
+            uniqueness: true
+
+  # has_one :primary_instructor, through: :course_instructor
+
   default_scope { order("courses.term_id DESC, courses.course_code, courses.id DESC") }
 
   # Magic number also used in old? method below.

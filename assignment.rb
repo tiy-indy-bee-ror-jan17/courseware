@@ -1,11 +1,37 @@
 class Assignment < ActiveRecord::Base
 
+  belongs_to :lesson, foreign_key: "in_class_assignment_id"
+  belongs_to :course, dependent: :destroy
+
+  has_many :lesson_assignments,
+            class_name: "Lesson",
+            foreign_key: "in_class_assignment_id"
+
+  has_many :lessons,
+            class_name: "Lesson",
+            foreign_key: "pre_class_assignment_id"
+
+  has_many :assignment_grades
+
+  validates :course_id, presence: true
+  validates :name, presence: true,
+                   uniqueness: true
+                   {scope: :course, message: "Only one unique assignment name per course"}
+  validates :percent_of_grade, presence: true
+  validate  :due_date_cannot_be_before_active_at
+
   scope :active_for_students, -> { where("active_at <= ? AND due_at >= ? AND students_can_submit = ?", Time.now, Time.now, true) }
 
   delegate :code_and_name, :color, to: :course, prefix: true
 
   def status(user = nil)
     AssignmentStatus.new(assignment: self, user: user)
+  end
+
+  def due_date_cannot_be_before_active_at
+    if due_at.present? && active_at.present? && due_at < active_at
+      errors.add(:due_at, "can't be due before it's active")
+    end
   end
 
   def turn_in(answers, user, final=true)
