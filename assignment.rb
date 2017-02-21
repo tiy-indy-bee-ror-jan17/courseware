@@ -2,7 +2,23 @@ class Assignment < ActiveRecord::Base
 
   scope :active_for_students, -> { where("active_at <= ? AND due_at >= ? AND students_can_submit = ?", Time.now, Time.now, true) }
 
+  belongs_to :course
+  has_many :lessons_in, class_name: "Lesson", foreign_key: "in_class_assignment_id"
+  has_many :lessons_pre, class_name: "Lesson", foreign_key: "pre_class_assignment_id"
+  has_many :assignment_grades
+
+  validate :valid_date_for_due_at
+  validates :course_id, presence: true
+  validates :name, presence: true, uniqueness: {scope: :course, message: "can't be duplicates in the same course!!"}
+  validates :percent_of_grade, presence: true
+
   delegate :code_and_name, :color, to: :course, prefix: true
+
+  def valid_date_for_due_at
+    if (active_at && due_at) && (due_at < active_at)
+      errors.add(:due_at, "Must be later than active_at")
+    end
+  end
 
   def status(user = nil)
     AssignmentStatus.new(assignment: self, user: user)

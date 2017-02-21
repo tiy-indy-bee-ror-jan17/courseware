@@ -3,6 +3,10 @@ class CourseStudent < ActiveRecord::Base
   scope :approved, -> { where(approved: true) }
   scope :unapproved, -> { where(approved: false) }
 
+  belongs_to :course
+  belongs_to :student, class_name: "User"
+  has_many :assignment_grades
+
   delegate :code_and_name, :color, to: :course, prefix: true
   delegate :full_name, :first_name, :last_name, :email, to: :student
   delegate :grading_method, to: :course
@@ -64,11 +68,11 @@ class CourseStudent < ActiveRecord::Base
   end
 
   def total_time
-    time_cards.completed.sum &:duration_in_hours
+    time_cards.completed.sum(&:duration_in_hours)
   end
 
   def time_this_week
-    time_cards.completed_this_week.sum &:duration_in_hours
+    time_cards.completed_this_week.sum(&:duration_in_hours)
   end
 
   def check_in_or_out
