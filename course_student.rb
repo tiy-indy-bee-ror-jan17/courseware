@@ -4,6 +4,7 @@ class CourseStudent < ActiveRecord::Base
   belongs_to :course
 
   has_many :assignment_grades
+  has_many :tags, as: :taggable
 
   scope :approved, -> { where(approved: true) }
   scope :unapproved, -> { where(approved: false) }

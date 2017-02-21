@@ -13,6 +13,8 @@ class Lesson < ActiveRecord::Base
   has_many :child_lessons, class_name: 'Lesson',
                            foreign_key: 'parent_lesson_id'
 
+  has_many :tags, as: :taggable
+
   delegate :code_and_name, to: :course, prefix: true
 
   default_scope { order(:id) }

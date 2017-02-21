@@ -112,6 +112,12 @@ class ApplicationMigration < ActiveRecord::Migration
       t.datetime "updated_at"
     end
 
+    create_table "tags", force: true do |t|
+      t.string   "name"
+      t.integer  "taggable_id"
+      t.text     "taggable_type"
+    end
+
     create_table "terms", force: true do |t|
       t.string   "name"
       t.date     "starts_on"

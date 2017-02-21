@@ -19,6 +19,7 @@ require_relative 'tests/misc_tests'
 require_relative 'tests/mypetocean_tests'
 require_relative 'tests/lesson_tests'
 require_relative 'tests/course_tests'
+require_relative 'tests/tag_tests'
 
 def rand_a_z(len=rand(26))
   ('a'..'z').to_a.sample(len).join

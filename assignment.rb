@@ -7,6 +7,7 @@ class Assignment < ActiveRecord::Base
                                class_name: 'Lesson'
   has_many :lessons, foreign_key: 'in_class_assignment_id'
   has_many :assignment_grades
+  has_many :tags, as: :taggable
 
   validates :course_id, presence: true
   validates :name, presence: true, uniqueness: { scope: :course_id }
