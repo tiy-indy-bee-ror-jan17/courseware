@@ -222,7 +222,18 @@ class ApplicationTest < Minitest::Test
   end
 
   def test_child_lessons_are_ordered_by_id
-    lesson = Lesson.create()
+    lesson = Lesson.create(name: "Parent Lesson")
+    lesson1 = Lesson.create(name: "First Child Lesson")
+    lesson2 = Lesson.create(name: "Second Child Lesson")
+    lesson3 = Lesson.create(name: "Third Child Lesson")
+    lesson4 = Lesson.create(name: "Fourth Child Lesson")
+    lesson.child_lessons << lesson2
+    lesson.child_lessons << lesson4
+    lesson.child_lessons << lesson1
+    lesson.child_lessons << lesson3
+    assert lesson.child_lessons.first == lesson1
+    assert_equal [lesson1, lesson2, lesson3, lesson4], lesson.child_lessons.to_a
+    assert_equal 4, lesson.child_lessons.length
   end
 
 # End Person A Tests
