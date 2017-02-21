@@ -34,6 +34,7 @@ class CourseTest < Minitest::Test
     cs = CourseStudent.create(course_id: @course.id, student_id: student.id)
 
     assert_equal 1, @course.students.length
+    assert @course.students.first == student
   end
 
   def test_a_course_has_one_primary_instructor

@@ -3,6 +3,8 @@ class AssignmentGrade < ActiveRecord::Base
   belongs_to :course_student
   belongs_to :assignment
 
+  has_many :tags, as: :taggable
+
   scope :graded, -> { joins(:assignment).where("assignments.grades_released IS TRUE") }
 
   delegate :course, to: :assignment

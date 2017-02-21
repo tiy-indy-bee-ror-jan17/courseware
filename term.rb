@@ -6,7 +6,9 @@ class Term < ActiveRecord::Base
   validates :school_id, presence: true
 
   belongs_to :school
+
   has_many :courses, dependent: :restrict_with_error
+  has_many :tags, as: :taggable
 
   default_scope { order('ends_on DESC') }
 
