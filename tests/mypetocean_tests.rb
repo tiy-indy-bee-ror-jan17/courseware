@@ -23,9 +23,14 @@ class MyPetOceanTest < Minitest::Test
   end
 
   def test_uniqueness
+    Course.find_or_create_by!(
+                              name: 'Floofers',
+                              course_code: 'Wfr532',
+                              term_id: @term.id
+                             )
     assert Course.create(
                          name: 'Catbutt & Other Great Things to Call Your Dumbass Friends',
-                         course_code: '532',
+                         course_code: 'Wfr532',
                          term_id: @term.id
                         ).invalid?
   end
