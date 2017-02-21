@@ -14,6 +14,7 @@ class Course < ActiveRecord::Base
   has_many :readings, through: :lessons
   has_many :students, through: :course_students
   has_many :instructors, through: :course_instructors
+  has_many :tags, as: :taggable
 
   has_one :primary_instructor, ->{ where(primary: true) }, class_name: 'CourseInstructor'
 
