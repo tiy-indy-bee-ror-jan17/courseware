@@ -1,5 +1,23 @@
 class Lesson < ActiveRecord::Base
+
+  validates :name, presence: true
+
+  belongs_to :course
+  belongs_to :pre_class_assignment, class_name: 'Assignment',
+                                    foreign_key: 'pre_class_assignment_id'
+  belongs_to :in_class_assignment, class_name: "Assignment",
+                                   foreign_key: 'in_class_assignment_id'
+  belongs_to :parent_lesson, class_name: 'Lesson'
+
+  has_many :readings, dependent: :destroy
+  has_many :child_lessons, class_name: 'Lesson',
+                           foreign_key: 'parent_lesson_id'
+
+  has_many :tags, as: :taggable
+
   delegate :code_and_name, to: :course, prefix: true
+
+  default_scope { order(:id) }
 
   scope :roots, -> { where("parent_lesson_id IS NULL") }
   scope :without_day_assignments, -> { where("day_assignment_id IS NULL") }

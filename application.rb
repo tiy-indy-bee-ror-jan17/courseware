@@ -1,5 +1,7 @@
 require 'active_record'
 
+# ActiveRecord::Base.logger = Logger.new(STDOUT)
+
 ActiveRecord::Base.establish_connection(
   adapter:  'sqlite3',
   database: 'development.sqlite3'
@@ -15,3 +17,4 @@ require './reading.rb'
 require './school.rb'
 require './term.rb'
 require './user.rb'
+require './tag.rb'
